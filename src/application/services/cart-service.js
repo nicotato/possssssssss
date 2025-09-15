@@ -10,7 +10,11 @@ export class CartService {
   addProduct(product) {
   if(!product || !product.id) return;
   const existing = this.lines.get(product.id);
-  const unitPrice = typeof product.unitPrice === 'number' ? product.unitPrice : product.price || 0;
+  // Try different price fields: unitPrice, price, basePrice
+  const unitPrice = typeof product.unitPrice === 'number' ? product.unitPrice 
+                  : typeof product.price === 'number' ? product.price 
+                  : typeof product.basePrice === 'number' ? product.basePrice 
+                  : 0;
   const name = product.name || product.title || product.id;
     if (existing) {
       existing.qty += 1;
@@ -34,7 +38,7 @@ export class CartService {
     if (line.qty <= 0) {
       this.lines.delete(productId);
     } else {
-      line.lineTotal = line.qty * line.unitPrice;
+      line.lineTotal = line.qty * (line.unitPrice || line.price || line.basePrice);
     }
   this._persist();
   }
