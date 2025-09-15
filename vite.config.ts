@@ -9,7 +9,7 @@ export default defineConfig(({ mode, command }) => {
   
   return {
     // GitHub Pages deployment configuration
-    base: process.env.NODE_ENV === 'production' ? '/pos-pizzeria/' : '/',
+    base: process.env.NODE_ENV === 'production' ? '/possssssssss/' : '/',
     build: {
       sourcemap: true,
       rollupOptions: {

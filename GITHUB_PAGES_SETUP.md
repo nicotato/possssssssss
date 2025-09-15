@@ -54,7 +54,7 @@ Cada vez que hagas `git push` a la rama `main`, GitHub Actions:
 Una vez desplegada, tu aplicación estará disponible en:
 
 ```
-https://TU_USUARIO.github.io/pos-pizzeria/
+https://TU_USUARIO.github.io/possssssssss/
 ```
 
 ## 🛠️ Scripts Disponibles
@@ -152,4 +152,4 @@ Para usar un dominio personalizado:
 
 Una vez completados estos pasos, tu aplicación POS Pizzería estará disponible públicamente en GitHub Pages con deployment automático cada vez que hagas cambios. 
 
-**URL final**: `https://TU_USUARIO.github.io/pos-pizzeria/`
+**URL final**: `https://TU_USUARIO.github.io/possssssssss/`

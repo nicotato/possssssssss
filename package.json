@@ -14,7 +14,7 @@
     "build": "vite build",
     "build:github": "NODE_ENV=production vite build",
     "preview": "vite preview",
-    "preview:github": "vite preview --base=/pos-pizzeria/",
+    "preview:github": "vite preview --base=/possssssssss/",
     "test": "vitest run",
     "test:ci": "vitest run --reporter=verbose --no-coverage || true",
     "test:watch": "vitest",
