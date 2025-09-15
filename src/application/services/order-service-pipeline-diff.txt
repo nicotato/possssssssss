@@ -1,0 +1,18 @@
+// Pseudocódigo dentro finalizeSale():
+const branchId = this.branchService.getBranch();
+const linesBase = this.cartService.toArray().map(l=>({...l}));
+const netBeforePromotions = linesBase.reduce((a,l)=>a+l.lineTotal,0);
+
+const promoResult = await this.promotionService.applyPromotions(linesBase, branchId);
+// promoResult.lines mutado
+const netAfterPromotions = promoResult.lines.reduce((a,l)=>a+l.lineTotal,0);
+const promotionDiscountTotal = promoResult.promotionDiscountTotal;
+
+const discountCalc = this.pricing.calculate(promoResult.lines, discounts);
+// discountCalc.subTotal es netAfterPromotions - discountTotal
+
+const netAfterDiscount = discountCalc.subTotal;
+const taxResult = await this.taxService.calculate(promoResult.lines);
+const tipResult = this.tipService.computeTip(netAfterDiscount, tipConfig);
+
+const grandTotal = +(netAfterDiscount + taxResult.totalTax + tipResult.tipAmount).toFixed(2);

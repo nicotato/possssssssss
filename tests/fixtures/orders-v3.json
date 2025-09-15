@@ -1,0 +1,14 @@
+[
+  {
+    "id": "ord3_1",
+    "version": 3,
+    "timestamp": "2023-01-01T00:00:00.000Z",
+    "lines": [
+      {
+        "productId": "pizza_margherita",
+        "qty": 2,
+        "unitPrice": 10.50
+      }
+    ]
+  }
+]

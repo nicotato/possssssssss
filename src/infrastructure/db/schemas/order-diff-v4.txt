@@ -1,0 +1,13 @@
+// order schema v4 differences (añadir):
+branchId:{type:'string'},
+appliedPromotions:{
+  type:'array',
+  items:{ type:'object', properties:{
+    promoId:{type:'string'},
+    description:{type:'string'},
+    discountAmount:{type:'number'}
+  }}
+},
+promotionDiscountTotal:{type:'number'},
+netBeforePromotions:{type:'number'},
+netAfterPromotions:{type:'number'}

@@ -1,0 +1,23 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.stockMovementSchema = void 0;
+exports.stockMovementSchema = {
+    title: 'stock movement schema',
+    version: 0,
+    primaryKey: { key: 'id', fields: ['id'], separator: '|' },
+    type: 'object',
+    properties: {
+        id: { type: 'string', maxLength: 80 },
+        createdAt: { type: 'string', format: 'date-time', maxLength: 40 },
+        type: { type: 'string', enum: ['CONSUMPTION', 'ADJUSTMENT', 'WASTE', 'PURCHASE'] },
+        ingredientId: { type: 'string', maxLength: 64 },
+        productId: { type: 'string', maxLength: 64 },
+        qty: { type: 'number', minimum: 0, multipleOf: 0.0001 },
+        unitCostBase: { type: 'number', minimum: 0, multipleOf: 0.0001 },
+        branchId: { type: 'string', maxLength: 64 },
+        reference: { type: 'string', maxLength: 64 },
+        note: { type: 'string', maxLength: 240 },
+        source: { type: 'string', maxLength: 64 }
+    },
+    required: ['id', 'createdAt', 'type', 'qty']
+};

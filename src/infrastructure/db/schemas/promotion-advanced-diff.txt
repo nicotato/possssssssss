@@ -1,0 +1,8 @@
+// Add to promotion schema:
+stackable:{type:'boolean', default:true},
+excludes:{ type:'array', items:{ type:'string' } },   // lista de promoIds incompatibles
+logic:{
+  type:'object',                                     // JSONLogic object
+  additionalProperties:true
+},
+dsl:{type:'string'}                                  // alternativa DSL textual

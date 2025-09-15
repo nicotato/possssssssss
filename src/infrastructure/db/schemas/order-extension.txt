@@ -1,0 +1,20 @@
+// Extiende el schema de orders (versión 3 si estabas en 2)
+additional properties añadidas:
+  tipAmount:{type:'number'},
+  taxLines:{
+    type:'array',
+    items:{
+      type:'object',
+      properties:{
+        code:{type:'string'},
+        base:{type:'number'},
+        rate:{type:'number'},
+        amount:{type:'number'},
+        scope:{type:'string'}
+      }
+    }
+  },
+  taxTotal:{type:'number'},
+  netTotal:{type:'number'},
+  grossTotal:{type:'number'},
+  costOfGoodsEstimate:{type:'number'}

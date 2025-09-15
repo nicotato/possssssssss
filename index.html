@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>POS - Pizzería del Barrio</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  
+  <!-- Cache Control Meta Tags -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#f77f00"/>
+  
+  <!-- Stylesheets with cache busting -->
+  <link rel="stylesheet" href="style.css" />
+  
+  <!-- Development mode detection -->
+  <script>
+    window.isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (window.isDev) {
+      console.log('[Dev Mode] Cache debugging enabled');
+    }
+  </script>
+</head>
+<body>
+  <header id="legacy-header-removed" style="display:none"></header>
+  <main class="container">
+    <!-- React root (migrated UI). Legacy #view-container eliminado -->
+    <div id="react-root"></div>
+  </main>
+  <footer>
+    <p>© 2025 Pizzería del Barrio | POS Offline</p>
+    <div id="dev-info" style="display: none; font-size: 11px; color: #666; margin-top: 5px;">
+      Dev Mode: <span id="cache-status">Unknown</span> | 
+      <a href="#" onclick="window.cacheUtils?.forceRefresh()" style="color: #666;">Force Refresh</a>
+    </div>
+  </footer>
+  
+  <!-- Database Fix Script (opcional para limpieza) -->
+  <script src="fix-db.js"></script>
+  <!-- Legacy bootstrap deshabilitado: <script type="module" src="src/main.js"></script> -->
+    <script type="module" src="src/ui/main-react.tsx"></script>
+</body>
+</html>

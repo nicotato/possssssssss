@@ -1,0 +1,5 @@
+// Después de calcular discounts:
+const taxResult = await this.taxService.calculate(lines);
+const netAfterDiscount = subTotal - discountTotal;
+const tipResult = this.tipService.computeTip(netAfterDiscount, tipConfig);
+// gross = netAfterDiscount + tax + tip

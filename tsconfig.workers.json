@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist/workers",
+    "noEmit": false
+  },
+  "include": [
+    "src/workers/**/*"
+  ]
+}

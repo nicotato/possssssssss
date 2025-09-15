@@ -1,0 +1,30 @@
+// Dentro de finalizeSale antes de persistir:
+
+// 1. Obtener branchId
+const branchId = this.branchService.getBranch();
+
+// 2. Calcular costo std y real por producto (pre-promo) para cada línea
+for (const line of linesBase) {
+  const costInfo = await this.costComputation.computeCostsForLine(line.productId, line.qty);
+  line.stdUnitCost = costInfo.stdUnit;
+  line.realUnitCost = costInfo.realUnit;
+}
+
+// 3. Promociones avanzadas
+const promoResult = await this.promotionService.applyPromotions(linesBase, branchId);
+// promoResult.lines → líneas actualizadas tras promos
+// promoResult.promotionDiscountTotal
+
+// 4. Descuentos manuales (como antes) sobre promoResult.lines
+// 5. Impuestos (taxService.calculate(promoResult.lines))
+// 6. Tip
+// 7. Multi-moneda (currencyService)
+// 8. Costo estándar y real totales
+const stdCostTotal = promoResult.lines.reduce((a,l)=> a + l.stdUnitCost * l.qty, 0);
+const realCostTotal = promoResult.lines.reduce((a,l)=> a + l.realUnitCost * l.qty, 0);
+const costVariance = +(realCostTotal - stdCostTotal).toFixed(2);
+
+// Guardar en order:
+// costStdTotalBase, costRealTotalBase, costVarianceBase
+// appliedPromotions, promotionDiscountTotal
+// branchId

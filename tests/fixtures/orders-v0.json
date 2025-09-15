@@ -1,0 +1,11 @@
+[
+  {
+    "id": "o_v0_1",
+    "createdAt": "2025-01-01T10:00:00.000Z",
+    "status": "completed",
+    "lines": [
+      { "productId": "p1", "name": "Prod1", "qty": 1, "unitPrice": 100, "lineTotal": 100 }
+    ],
+    "total": 100
+  }
+]
