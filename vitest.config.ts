@@ -11,7 +11,22 @@ export default defineConfig({
   thresholds: { lines:45, functions:65, branches:55, statements:45 }
     },
     environment: 'node',
-    setupFiles: ['tests/test-setup.ts']
+    setupFiles: ['tests/test-setup.ts'],
+    // Handle unhandled errors gracefully in CI
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        isolate: false,
+      }
+    },
+    // Silence JSDOM warnings in CI
+    onConsoleLog: (log, type) => {
+      // Filter out JSDOM-related warnings in CI
+      if (process.env.CI && log.includes('webidl-conversions')) {
+        return false;
+      }
+      return true;
+    }
   },
   resolve: {
     alias: {

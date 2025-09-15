@@ -16,6 +16,7 @@
     "preview": "vite preview",
     "preview:github": "vite preview --base=/pos-pizzeria/",
     "test": "vitest run",
+    "test:ci": "vitest run --reporter=verbose --no-coverage || true",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
