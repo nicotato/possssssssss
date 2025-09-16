@@ -118,11 +118,6 @@ export const MenuPage: React.FC = () => {
   const finalizar = async (printKitchen:boolean) => {
     try {
       const order = await cart.finalize({ printKitchen });
-      if(printKitchen && services.auth.hasPermission('KITCHEN_PRINT')) {
-        services.printing?.printBoth(order, (t)=> services.orders.markPrinted(order.id, t));
-      } else if(services.auth.hasPermission('INVOICE_PRINT')) {
-        services.printing?.printInvoice(order, ()=> services.orders.markPrinted(order.id,'invoice'));
-      }
       push({ type:'success', message:'Venta registrada' });
     } catch(e:any) { push({ type:'error', message:e.message || 'Error finalizando' }); }
   };
