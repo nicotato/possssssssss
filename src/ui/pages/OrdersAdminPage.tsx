@@ -40,7 +40,7 @@ export const OrdersAdminPage: React.FC = () => {
               <td>{o.id}</td>
               <td>{new Date(o.createdAt).toLocaleString()}</td>
               <td><StatusBadge status={o.status} /></td>
-              <td>${'{'}o.total{'}'}</td>
+              <td>${(o as any).total || (o as any).grandTotal || (o as any).grandTotalBase || 0}</td>
               <td>{o.customer?.name || ''} {o.customer?.phone ? `(${o.customer.phone})`: ''}</td>
               <td style={{display:'flex', flexWrap:'wrap', gap:'.3rem'}}>
                 {perms.printInv && <Button variant="outline" size="small" onClick={()=>printInvoice(o.id)} leftIcon="📄">Factura</Button>}
