@@ -19,6 +19,7 @@ import { PricingService } from '../application/services/pricing-service.js';
 import { PrintingService } from '../application/services/printing-service.js';
 import { ConfigurationService } from '../application/services/configuration-service.ts';
 import { KitchenPrinter } from '../infrastructure/printing/kitchen-printer.ts';
+import { EscPosPrinter } from '../infrastructure/printing/escpos-printer.ts';
 import { RemoteAdapter } from '../infrastructure/sync/remote-adapter.js';
 import { DEFAULT_ROLES } from '../domain/auth/constants.js';
 import { BASE_PERMISSIONS } from '../domain/auth/permissions.js';
@@ -62,7 +63,8 @@ export async function createAppEnvironment() {
     const printerConfig = services.config.getPrinterConfig();
     services.printing = new PrintingService({ 
       fallbackWindow: printerConfig.fallbackWindow,
-      kitchen: new KitchenPrinter()
+      kitchen: new KitchenPrinter(),
+      escpos: new EscPosPrinter()
     });
     if (services.printing.setPreferredMode) {
       services.printing.setPreferredMode(printerConfig.preferredMode);

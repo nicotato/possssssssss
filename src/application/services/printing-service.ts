@@ -1,5 +1,5 @@
-import type { OrderDTO } from '../../react/types/services.d.ts';
-import type { InvoicePrinter, KitchenPrinter, EscPosPrinterLike } from '../../react/types/services.d.ts';
+import type { OrderDTO } from '../../ui/types/services.d.ts';
+import type { InvoicePrinter, KitchenPrinter, EscPosPrinterLike } from '../../ui/types/services.d.ts';
 import { logger } from '../../infrastructure/logging/logger.ts';
 import { buildMoneyFormatter } from '../../utils/i18n-format.ts';
 

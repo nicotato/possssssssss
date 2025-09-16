@@ -1,7 +1,7 @@
 // TypeScript ESC/POS printer
 const ESC = '\x1B';
 const GS = '\x1D';
-import type { OrderDTO } from '../../react/types/services.d.ts';
+import type { OrderDTO } from '../../ui/types/services.d.ts';
 
 export class EscPosPrinter {
   private device: any = null;
