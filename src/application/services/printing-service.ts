@@ -30,9 +30,18 @@ export class PrintingService {
     this.invoice = opts.invoice;
     this.kitchen = opts.kitchen;
     this.escpos = opts.escpos;
-  if(opts.fallbackWindow === false) this.fallbackWindow = false;
-  // load preference
-  try { const stored = localStorage.getItem('print_pref'); if(stored==='escpos'||stored==='window'||stored==='auto') this.preferredMode = stored; } catch {}
+    if(opts.fallbackWindow === false) this.fallbackWindow = false;
+    
+    // load preferences from localStorage
+    try { 
+      const stored = localStorage.getItem('print_pref'); 
+      if(stored==='escpos'||stored==='window'||stored==='auto') this.preferredMode = stored; 
+    } catch {}
+    
+    try {
+      const storedFallback = localStorage.getItem('print_fallback_window');
+      if(storedFallback !== null) this.fallbackWindow = JSON.parse(storedFallback);
+    } catch {}
   }
 
   enqueue(job: PrintJob): string {
@@ -67,60 +76,129 @@ export class PrintingService {
 
   private async execute(job: QueueItem) {
     const { order, kind } = job;
-    const hasEscpos = !!this.escpos && (this.preferredMode==='auto' || this.preferredMode==='escpos');
-    // If ESC/POS printer present, we can use it for all
-    if(hasEscpos) {
-      // Attempt batching: collect similar jobs within batchWindowMs
-      if(job.kind==='invoice' || job.kind==='both' || job.kind==='kitchen') {
-        this.batchBuffer.push(job);
-        if(!this.batchTimer) {
-          this.batchTimer = setTimeout(async ()=> {
-            const batch = this.batchBuffer.splice(0, this.batchBuffer.length);
-            this.batchTimer = null;
-            if(batch.length>1) { this.metrics.batchCount++; logger.debug('Batch process', { size: batch.length }); }
-            // Combine invoices then kitchens
-            for(const j of batch) {
-              if(j.kind==='invoice' || j.kind==='both') {
-                await this.tryEscpos(async ()=> this.escpos!.printOrder(j.order as any, {}), j);
-                j.markPrinted?.('invoice');
-              }
-              if(j.kind==='kitchen' || j.kind==='both') {
-                await this.tryEscpos(async ()=> this.escpos!.printKitchen(j.order as any, {}), j);
-                j.markPrinted?.('kitchen');
-              }
-            }
-            // Emit updated metrics (batchCount may have changed) so observers can react promptly
-            this.emit('metrics', this.metrics);
-          }, this.batchWindowMs);
-        }
-        return; // job handled via batch mechanism
-      }
+    
+    logger.info('Executing print job', { 
+      jobKind: kind, 
+      preferredMode: this.preferredMode, 
+      fallbackWindow: this.fallbackWindow,
+      escposAvailable: !!this.escpos
+    });
+
+    // If preferred mode is window, go directly to fallback
+    if (this.preferredMode === 'window') {
+      logger.info('Preferred mode is window, using direct fallback');
       if(kind === 'invoice' || kind === 'both') {
-  await this.tryEscpos(async ()=> this.escpos!.printOrder(order as any, {}), job);
-        job.markPrinted?.('invoice');
+        if(this.fallbackWindow) {
+          logger.info('Using window for invoice');
+          this.windowInvoice(order);
+          job.markPrinted?.('invoice');
+        } else {
+          logger.warn('Window mode selected but fallback disabled');
+        }
       }
       if(kind === 'kitchen' || kind === 'both') {
-  await this.tryEscpos(async ()=> this.escpos!.printKitchen(order as any, {}), job);
-        job.markPrinted?.('kitchen');
+        if(this.kitchen?.openTicket) {
+          logger.info('Using kitchen printer');
+          this.kitchen.openTicket(order);
+          job.markPrinted?.('kitchen');
+        }
       }
       return;
     }
 
-    // Otherwise use dedicated adapters
-    if(kind === 'invoice' || kind === 'both') {
-      if(this.invoice?.openInvoice) {
-  this.invoice.openInvoice(order, ()=> job.markPrinted?.('invoice'));
-      } else if(this.fallbackWindow) {
-        this.windowInvoice(order);
-        job.markPrinted?.('invoice');
+    // ESC/POS mode: force ESC/POS only (strict mode)
+    if (this.preferredMode === 'escpos') {
+      if (this.escpos) {
+        logger.info('ESC/POS mode: using ESC/POS printer only (strict mode)');
+        try {
+          if(kind === 'invoice' || kind === 'both') {
+            await this.tryEscposStrict(async ()=> this.escpos!.printOrder(order as any, {}), job);
+            job.markPrinted?.('invoice');
+          }
+          if(kind === 'kitchen' || kind === 'both') {
+            await this.tryEscposStrict(async ()=> this.escpos!.printKitchen(order as any, {}), job);
+            job.markPrinted?.('kitchen');
+          }
+        } catch (error) {
+          // Handle fallback only for invoices when fallback is enabled
+          if (this.fallbackWindow && (kind === 'invoice' || kind === 'both')) {
+            logger.info('ESC/POS mode: fallback window enabled, using window after ESC/POS failure');
+            this.windowInvoice(order);
+            job.markPrinted?.('invoice');
+          } else if (kind === 'invoice' || kind === 'both') {
+            // No fallback for invoices - strict mode
+            logger.error('ESC/POS mode: strict mode failed and no fallback available for invoices');
+            throw error;
+          }
+          
+          // For kitchen orders, always try kitchen printer if available (independent of invoice handling)
+          if((kind === 'kitchen' || kind === 'both') && this.kitchen?.openTicket) {
+            logger.info('ESC/POS mode: using kitchen printer for kitchen orders');
+            this.kitchen.openTicket(order);
+            job.markPrinted?.('kitchen');
+          } else if (kind === 'kitchen') {
+            // Kitchen-only job failed and no kitchen printer available
+            logger.error('ESC/POS mode: no kitchen printer available');
+            throw error;
+          }
+        }
+      } else {
+        logger.error('ESC/POS mode selected but no ESC/POS printer available');
+        throw new Error('ESC/POS printer not available');
       }
+      return;
     }
-    if(kind === 'kitchen' || kind === 'both') {
-      if(this.kitchen?.openTicket) {
-        this.kitchen.openTicket(order);
-        job.markPrinted?.('kitchen');
+
+    // Auto mode: intelligent fallback (ESC/POS -> dedicated -> window)
+    if (this.preferredMode === 'auto') {
+      logger.info('Auto mode: trying intelligent fallback sequence');
+      
+      // Try ESC/POS first if available
+      if (this.escpos) {
+        logger.info('Auto mode: trying ESC/POS first');
+        try {
+          if(kind === 'invoice' || kind === 'both') {
+            await this.tryEscpos(async ()=> this.escpos!.printOrder(order as any, {}), job);
+            job.markPrinted?.('invoice');
+          }
+          if(kind === 'kitchen' || kind === 'both') {
+            await this.tryEscpos(async ()=> this.escpos!.printKitchen(order as any, {}), job);
+            job.markPrinted?.('kitchen');
+          }
+          return; // Success with ESC/POS
+        } catch (error) {
+          logger.info('Auto mode: ESC/POS failed, trying dedicated printers');
+        }
       }
+      
+      // Fallback to dedicated printers
+      logger.info('Auto mode: using dedicated adapters');
+      if(kind === 'invoice' || kind === 'both') {
+        if(this.invoice?.openInvoice) {
+          logger.info('Auto mode: using dedicated invoice printer');
+          this.invoice.openInvoice(order, ()=> job.markPrinted?.('invoice'));
+        } else if(this.fallbackWindow) {
+          logger.info('Auto mode: using window fallback');
+          this.windowInvoice(order);
+          job.markPrinted?.('invoice');
+        } else {
+          logger.warn('Auto mode: no invoice options available');
+        }
+      }
+      if(kind === 'kitchen' || kind === 'both') {
+        if(this.kitchen?.openTicket) {
+          logger.info('Auto mode: using kitchen printer');
+          this.kitchen.openTicket(order);
+          job.markPrinted?.('kitchen');
+        } else {
+          logger.warn('Auto mode: no kitchen printer available');
+        }
+      }
+      return;
     }
+
+    // This should never be reached if modes are handled correctly above
+    logger.error('Unexpected execution path in printing service', { preferredMode: this.preferredMode });
   }
 
   printInvoice(order: OrderDTO, markPrinted?: (t:'invoice')=>void) { return this.enqueue({ kind:'invoice', order, markPrinted }); }
@@ -129,17 +207,116 @@ export class PrintingService {
 
   private windowInvoice(order: OrderDTO) {
     const linesHtml = (order.lines||[]).map((l: any)=>`<tr><td>${l.qty} x ${l.name}</td><td style="text-align:right">${this.moneyFmt(l.lineTotal)}</td></tr>`).join('');
+    
+    // Calcular totales para factura con impuestos
+    const subtotal = (order.lines||[]).reduce((sum: number, l: any) => sum + (l.lineTotal || 0), 0);
+    const taxTotal = (order.taxTotal || 0);
     const totalFmt = this.moneyFmt(order.total||0);
-    const html = `<html><head><title>${order.id}</title><style>body{font-family:monospace;margin:8px;}table{width:100%;font-size:12px;border-collapse:collapse;}td{padding:2px 0;}thead td{border-bottom:1px solid #000;}tfoot td{border-top:1px solid #000;font-weight:bold;}</style></head><body>
-    <h3 style='margin:0 0 4px'>Factura ${order.id}</h3>
-    <small>${order.createdAt}</small>
-    <table><thead><tr><td>Item</td><td style='text-align:right'>Importe</td></tr></thead><tbody>${linesHtml}</tbody><tfoot><tr><td>Total</td><td style='text-align:right'>${totalFmt}</td></tr></tfoot></table>
+    const subtotalFmt = this.moneyFmt(subtotal);
+    const taxTotalFmt = this.moneyFmt(taxTotal);
+    
+    // HTML para impuestos detallados
+    let taxHtml = '';
+    if (order.taxLines && order.taxLines.length > 0) {
+      // Consolidar impuestos por código
+      const taxMap = new Map();
+      order.taxLines.forEach((tax: any) => {
+        const existing = taxMap.get(tax.code);
+        if (existing) {
+          existing.amount += tax.amount;
+        } else {
+          taxMap.set(tax.code, { ...tax });
+        }
+      });
+      
+      const consolidatedTaxes = Array.from(taxMap.values());
+      taxHtml = consolidatedTaxes.map((tax: any) => 
+        `<tr><td style="padding-left: 10px;">${tax.name || tax.code} (${(tax.rate * 100).toFixed(1)}%)</td><td style="text-align:right">+${this.moneyFmt(tax.amount)}</td></tr>`
+      ).join('');
+    }
+    
+    const html = `<html><head><title>Factura ${order.id}</title><style>
+      body{font-family: 'Courier New', monospace; margin: 12px; font-size: 14px;}
+      .header {text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px;}
+      .business-name {font-size: 18px; font-weight: bold; margin: 0;}
+      .business-info {font-size: 12px; margin: 2px 0;}
+      table{width:100%; font-size: 13px; border-collapse:collapse; margin: 8px 0;}
+      .invoice-info {margin-bottom: 12px; font-size: 12px;}
+      .items-table td{padding: 3px 0; border-bottom: 1px dotted #ccc;}
+      .items-header td{border-bottom: 1px solid #000; font-weight: bold; padding: 4px 0;}
+      .subtotal-section {border-top: 1px solid #000; margin-top: 8px;}
+      .subtotal-section td{padding: 2px 0;}
+      .tax-line {font-size: 12px; color: #666;}
+      .total-line {border-top: 2px solid #000; font-weight: bold; font-size: 15px;}
+      .footer {text-align: center; margin-top: 20px; font-size: 11px; color: #666;}
+      .customer-info {margin: 8px 0; font-size: 12px; border: 1px solid #ddd; padding: 6px;}
+    </style></head><body>
+    
+    <div class="header">
+      <div class="business-name">Pizzería del Barrio</div>
+      <div class="business-info">Sistema POS - Factura de Venta</div>
+    </div>
+    
+    <div class="invoice-info">
+      <strong>Factura:</strong> ${order.id}<br>
+      <strong>Fecha:</strong> ${new Date(order.createdAt).toLocaleString('es-AR')}<br>
+      ${order.customerName ? `<strong>Cliente:</strong> ${order.customerName}<br>` : ''}
+      ${order.customerPhone ? `<strong>Teléfono:</strong> ${order.customerPhone}<br>` : ''}
+    </div>
+    
+    ${order.customer ? `
+    <div class="customer-info">
+      <strong>📞 ${order.customer.phone || order.customerPhone || ''}</strong><br>
+      ${order.customer.name || order.customerName || ''}<br>
+      ${order.customer.address || ''} ${order.customer.barrio ? `- ${order.customer.barrio}` : ''}
+    </div>
+    ` : ''}
+    
+    <table class="items-table">
+      <tr class="items-header">
+        <td><strong>Descripción</strong></td>
+        <td style="text-align:right"><strong>Importe</strong></td>
+      </tr>
+      ${linesHtml}
+    </table>
+    
+    <table class="subtotal-section">
+      <tr>
+        <td><strong>Subtotal</strong></td>
+        <td style="text-align:right"><strong>${subtotalFmt}</strong></td>
+      </tr>
+      ${taxHtml}
+      ${taxTotal > 0 ? `
+      <tr>
+        <td><strong>Total Impuestos</strong></td>
+        <td style="text-align:right"><strong>${taxTotalFmt}</strong></td>
+      </tr>
+      ` : ''}
+      <tr class="total-line">
+        <td><strong>TOTAL A PAGAR</strong></td>
+        <td style="text-align:right"><strong>${totalFmt}</strong></td>
+      </tr>
+    </table>
+    
+    ${order.payments && order.payments.length > 0 ? `
+    <table style="margin-top: 12px;">
+      <tr><td colspan="2"><strong>Forma de Pago:</strong></td></tr>
+      ${order.payments.map((p: any) => `<tr><td>${p.method}</td><td style="text-align:right">${this.moneyFmt(p.amount)}</td></tr>`).join('')}
+    </table>
+    ` : ''}
+    
+    <div class="footer">
+      <p>¡Gracias por su compra!</p>
+      <p>POS Sistema - ${new Date().getFullYear()}</p>
+    </div>
+    
     </body></html>`;
-    const w = window.open('', '_blank', 'width=480,height=640');
+    
+    const w = window.open('', '_blank', 'width=480,height=640,scrollbars=yes');
     if(!w) return;
     w.document.write(html);
     w.document.close();
-    setTimeout(()=> w.print(), 200);
+    setTimeout(()=> w.print(), 300);
   }
 
   // Preference API
@@ -184,22 +361,51 @@ export class PrintingService {
   private emit(evt:string, data:any) { (this.listeners[evt]||[]).forEach(f=> { try { f(data);} catch(e){ logger.error('Listener error', { evt, error:String(e) }); } }); }
 
   private async tryEscpos(fn:()=>Promise<void>, job:QueueItem): Promise<void> {
-    try { await fn(); }
-    catch(e) {
+    try { 
+      await fn(); 
+    } catch(e) {
       if(job.attempts==null) job.attempts = 0;
       const attempt = job.attempts++;
       if(attempt < this.escposRetryDelays.length) {
         const delay = this.escposRetryDelays[attempt];
-  logger.warn('EscPos retry', { delay, attempt });
+        logger.warn('EscPos retry', { delay, attempt });
         this.metrics.escposRetries++;
         await new Promise(r=> setTimeout(r, delay));
         return this.tryEscpos(fn, job);
       }
-  logger.error('EscPos giving up after retries', { error:String(e) });
-      // fallback to window if allowed
-      if(this.fallbackWindow && this.preferredMode!=='escpos') {
+      
+      logger.error('EscPos failed after retries', { error:String(e), preferredMode: this.preferredMode, fallbackWindow: this.fallbackWindow });
+      
+      // Use fallback window if enabled, regardless of preferred mode
+      if(this.fallbackWindow) {
+        logger.info('Using fallback window after ESC/POS failure');
         this.windowInvoice(job.order);
-      } else throw e;
+        return; // Success via fallback
+      } 
+      
+      // No fallback available, throw error
+      throw new Error(`ESC/POS printing failed: ${String(e)}`);
+    }
+  }
+
+  private async tryEscposStrict(fn:()=>Promise<void>, job:QueueItem): Promise<void> {
+    try { 
+      await fn(); 
+    } catch(e) {
+      if(job.attempts==null) job.attempts = 0;
+      const attempt = job.attempts++;
+      if(attempt < this.escposRetryDelays.length) {
+        const delay = this.escposRetryDelays[attempt];
+        logger.warn('EscPos retry (strict mode)', { delay, attempt });
+        this.metrics.escposRetries++;
+        await new Promise(r=> setTimeout(r, delay));
+        return this.tryEscposStrict(fn, job);
+      }
+      
+      logger.error('EscPos failed after retries (strict mode)', { error:String(e), preferredMode: this.preferredMode, fallbackWindow: this.fallbackWindow });
+      
+      // In strict mode, do NOT use automatic fallback - let the caller handle it
+      throw new Error(`ESC/POS printing failed (strict mode): ${String(e)}`);
     }
   }
 }

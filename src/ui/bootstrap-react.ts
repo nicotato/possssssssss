@@ -6,8 +6,9 @@ import { RxUserRepository } from '../infrastructure/repositories/rx-user-reposit
 import { RxRoleRepository } from '../infrastructure/repositories/rx-role-repository.js';
 import { RxAuditRepository } from '../infrastructure/repositories/rx-audit-repository.js';
 import { RxSyncQueueRepository } from '../infrastructure/repositories/rx-sync-queue-repository.js';
+import { RxTaxRepository } from '../infrastructure/repositories/rx-tax-repository.js';
 
-import { CartService } from '../application/services/cart-service.js';
+import { CartService } from '../application/services/cart-service.ts';
 import { OrderService } from '../application/services/order-service.js';
 import { AuthService } from '../application/services/auth-service.js';
 import { AuditService } from '../application/services/audit-service.js';
@@ -18,6 +19,7 @@ import { SyncService } from '../application/services/sync-service.js';
 import { PricingService } from '../application/services/pricing-service.js';
 import { PrintingService } from '../application/services/printing-service.js';
 import { ConfigurationService } from '../application/services/configuration-service.ts';
+import { TaxService } from '../application/services/tax-service.ts';
 import { KitchenPrinter } from '../infrastructure/printing/kitchen-printer.ts';
 import { EscPosPrinter } from '../infrastructure/printing/escpos-printer.ts';
 import { RemoteAdapter } from '../infrastructure/sync/remote-adapter.js';
@@ -38,7 +40,8 @@ export async function createAppEnvironment() {
       users: new RxUserRepository(db),
       roles: new RxRoleRepository(db),
       audit: new RxAuditRepository(db),
-      queue: new RxSyncQueueRepository(db)
+      queue: new RxSyncQueueRepository(db),
+      taxes: new RxTaxRepository(db)
     };
     console.log('[Bootstrap] Repositorios creados');
 
@@ -52,15 +55,21 @@ export async function createAppEnvironment() {
     services.config = new ConfigurationService();
     console.log('[Bootstrap] Servicio de configuración creado');
     
+    services.tax = new TaxService(repos.taxes);
+    await services.tax.createDefaultTaxes();
+    console.log('[Bootstrap] Servicio de impuestos creado');
+    
     services.auth = new AuthService(repos.users, repos.roles, services.audit, { durationMinutes: 90 });
     await services.auth.initialize();
     console.log('[Bootstrap] Servicio de autenticación inicializado');
     
     services.cart = new CartService();
+    services.cart.setTaxService(services.tax);
     services.pricing = new PricingService();
     
     // Inicializar PrintingService con configuración
     const printerConfig = services.config.getPrinterConfig();
+    console.log('[Bootstrap] Configuración de impresora:', printerConfig);
     services.printing = new PrintingService({ 
       fallbackWindow: printerConfig.fallbackWindow,
       kitchen: new KitchenPrinter(),
@@ -69,6 +78,10 @@ export async function createAppEnvironment() {
     if (services.printing.setPreferredMode) {
       services.printing.setPreferredMode(printerConfig.preferredMode);
     }
+    if (services.printing.setFallbackWindow) {
+      services.printing.setFallbackWindow(printerConfig.fallbackWindow);
+    }
+    console.log('[Bootstrap] PrintingService inicializado - modo:', services.printing.getPreferredMode(), 'fallback:', services.printing.getFallbackWindow());
     console.log('[Bootstrap] Servicios de carrito, pricing y printing creados');
     
     services.orders = new OrderService(repos.orders, services.cart, services.audit, services.auth, repos.queue, services.pricing);

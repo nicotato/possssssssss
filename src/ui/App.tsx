@@ -17,6 +17,7 @@ import { MenuPage } from './pages/MenuPage.tsx';
 import { VentasPage } from './pages/VentasPage.tsx';
 import { OrdersAdminPage } from './pages/OrdersAdminPage.tsx';
 import { ConfigurationPage } from './pages/ConfigurationPage.tsx';
+import { TaxManagementPage } from './pages/TaxManagementPage.tsx';
 import { FormDemoPage } from './pages/FormDemoPage.tsx';
 import { ComponentsDemo } from './pages/ComponentsDemo.tsx';
 import { LoginModernExample } from './pages/LoginModernExample.tsx';
@@ -83,6 +84,7 @@ export const App: React.FC = () => {
                 <Route path="/reportes" element={<Protected><ReportsPage /></Protected>} />
                 <Route path="/audit" element={<Protected><AuditPage /></Protected>} />
                 <Route path="/configuracion" element={<Protected><ConfigurationPage /></Protected>} />
+                <Route path="/impuestos" element={<Protected><TaxManagementPage /></Protected>} />
                 <Route path="/form-demo" element={<Protected><FormDemoPage /></Protected>} />
                 <Route path="/components-demo" element={<Protected><ComponentsDemo /></Protected>} />
                 <Route path="/login-modern" element={<Protected><LoginModernExample /></Protected>} />

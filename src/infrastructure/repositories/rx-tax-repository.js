@@ -11,4 +11,10 @@ export class RxTaxRepository {
     await doc.incrementalPatch(patch);
     return doc.toJSON();
   }
+  async delete(id) {
+    const doc = await this.col.findOne(id).exec();
+    if(!doc) return false;
+    await doc.remove();
+    return true;
+  }
 }

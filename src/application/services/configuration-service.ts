@@ -3,9 +3,6 @@ import { logger } from '../../infrastructure/logging/logger.ts';
 export interface SystemConfig {
   printer: {
     preferredMode: 'auto' | 'escpos' | 'window';
-    escposEnabled: boolean;
-    windowEnabled: boolean;
-    usbEnabled: boolean;
     fallbackWindow: boolean;
   };
   ui: {
@@ -22,9 +19,6 @@ export interface SystemConfig {
 const DEFAULT_CONFIG: SystemConfig = {
   printer: {
     preferredMode: 'auto',
-    escposEnabled: true,
-    windowEnabled: true,
-    usbEnabled: false,
     fallbackWindow: true
   },
   ui: {

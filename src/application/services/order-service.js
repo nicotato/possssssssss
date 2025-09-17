@@ -14,26 +14,38 @@ export class OrderService {
 
   async finalizeSale({ customerData, discounts = [], payments = [] }) {
     if (this.cartService.isEmpty()) throw new Error('Carrito vacío');
-    const lines = this.cartService.toArray().map(l => ({ ...l }));
+    
+    // Obtener datos del carrito con impuestos
+    const orderData = this.cartService.toOrderData ? 
+      this.cartService.toOrderData(customerData) : 
+      this._buildLegacyOrderData(customerData, discounts, payments);
+
+    // Aplicar descuentos y pagos usando el pricing service
+    const lines = orderData.lines || this.cartService.toArray().map(l => ({ ...l }));
     const { subTotal, discountTotal, grandTotal, appliedDiscounts } =
       this.pricing.calculate(lines, discounts);
+    // Calcular total final incluyendo impuestos
+    const cartTotal = orderData.total || 0; // Total del carrito con impuestos
+    const totalWithTaxes = cartTotal - discountTotal; // Aplicar descuentos al total con impuestos
+    
     const { amountPaid, changeDue, paymentStatus } =
-      this.pricing.evaluatePaymentStatus(grandTotal, payments);
+      this.pricing.evaluatePaymentStatus(totalWithTaxes, payments);
 
     const order = {
-      id: generateId('o'),
-      createdAt: nowIso(),
+      ...orderData,
+      id: orderData.id || generateId('o'),
+      createdAt: orderData.createdAt || nowIso(),
       status: 'completed',
       lines,
       subTotal,
       discountTotal,
-      grandTotal,
+      grandTotal, // Sin impuestos (para compatibilidad con reportes antiguos)
       discounts: appliedDiscounts,
       payments,
       amountPaid,
       changeDue,
       paymentStatus,
-      total: grandTotal, // legacy compatibility
+      total: totalWithTaxes, // Total final con impuestos y descuentos
       customerPhone: customerData?.phone || '',
       customerName: customerData?.name || '',
       sync: { synced: false, lastAttempt: null },
@@ -54,6 +66,20 @@ export class OrderService {
     });
     this.cartService.clear();
     return order;
+  }
+
+  _buildLegacyOrderData(customerData, discounts, payments) {
+    // Fallback para cuando el cartService no tiene toOrderData
+    const lines = this.cartService.toArray().map(l => ({ ...l }));
+    return {
+      id: generateId('o'),
+      createdAt: nowIso(),
+      lines,
+      taxLines: [],
+      taxTotal: 0,
+      customerPhone: customerData?.phone || '',
+      customerName: customerData?.name || ''
+    };
   }
 
   async cancelOrder(id) {

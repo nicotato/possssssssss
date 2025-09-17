@@ -12,6 +12,7 @@ const NAV_ITEMS: { path: string; label: string; icon: string; perm?: string }[] 
   { path: '/reportes', label: 'Reportes', icon: '📊', perm: 'REPORT_VIEW' },
   { path: '/audit', label: 'Auditoría', icon: '🔍', perm: 'AUDIT_VIEW' },
   { path: '/configuracion', label: 'Configuración', icon: '⚙️', perm: 'USER_VIEW' },
+  { path: '/impuestos', label: 'Impuestos', icon: '🧾', perm: 'TAX_VIEW' },
   { path: '/form-demo', label: 'Demo Formularios', icon: '🎨', perm: 'PRODUCT_VIEW' },
   { path: '/components-demo', label: 'Componentes', icon: '🧩', perm: 'PRODUCT_VIEW' },
   { path: '/login-modern', label: 'Login Moderno', icon: '🔐', perm: 'PRODUCT_VIEW' },

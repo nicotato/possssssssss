@@ -6,6 +6,7 @@ import { useToasts } from '../components/ToastProvider.tsx';
 import { useConfirm } from '../components/ConfirmProvider.tsx';
 import { useFormModal } from '../hooks/useFormModal.js';
 import { Input, Button, Card, CardHeader, CardBody, Badge } from '../components/index.js';
+import { ProfessionalCart } from '../components/ProfessionalCart.tsx';
 
 import { DISCOUNT_TYPES } from '../../domain/discounts/discount-types.js';
 import { PAYMENT_METHODS } from '../../domain/payments/payment-methods.js';
@@ -176,85 +177,96 @@ export const MenuPage: React.FC = () => {
         </div>
       </section>
       <aside className="carrito">
-        <h2 className="section-title" style={{marginTop:0}}>Pedido 🛒</h2>
-        <table style={{width:'100%', borderCollapse:'collapse', fontSize:'.6rem'}}>
-          <thead><tr style={{background:'#f77f00', color:'#fff'}}><th>Producto</th><th>Qty</th><th>Total</th><th></th></tr></thead>
-          <tbody>
-            {cart.lines.length===0 && <tr><td colSpan={4} style={{textAlign:'center'}}>Vacío</td></tr>}
-            {cart.lines.map(l=> (
-              <tr key={l.productId} style={{borderBottom:'1px solid #eee'}}>
-                <td>{l.name}</td>
-                <td>
-                  {cart.canSell && (
-                    <div style={{display:'flex', gap:'.2rem', alignItems:'center'}}>
-                      <Button variant="outline" size="small" onClick={()=>cart.changeQty(l.productId,-1)}>-</Button>
-                      {l.qty}
-                      <Button variant="outline" size="small" onClick={()=>cart.changeQty(l.productId,1)}>+</Button>
-                    </div>
-                  )}
-                </td>
-                <td>{formatMoney(l.lineTotal)}</td>
-                <td>{cart.canSell && <Button variant="danger" size="small" onClick={()=>cart.removeLine(l.productId)}>×</Button>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-  <div style={{fontSize:'.7rem', marginTop:'.4rem'}}>
-          <div>SubTotal: {formatMoney(cart.pricing.subTotal)}</div>
-          <div>Descuentos: -{formatMoney(cart.pricing.discountTotal)}</div>
-          <div style={{fontWeight:600}}>Total: {formatMoney(cart.pricing.grandTotal)}</div>
-          <div>Pagado: {formatMoney(cart.payment.amountPaid)} | Estado: {cart.payment.paymentStatus}</div>
-          {cart.payment.changeDue>0 && <div>Vuelto: {formatMoney(cart.payment.changeDue)}</div>}
-        </div>
-  <div style={{display:'flex', gap:'.4rem', flexWrap:'wrap', marginTop:'.8rem'}}>
-          <Button variant="outline" size="small" onClick={()=>setShowDiscounts(true)}>
-            Descuentos ({cart.discounts.length})
-          </Button>
-          <Button variant="outline" size="small" onClick={()=>setShowPayments(true)}>
-            Pagos ({cart.payments.length})
-          </Button>
-          <Button 
-            variant="danger" 
-            size="small" 
-            disabled={!cart.canSell} 
-            onClick={async ()=>{ if(await confirm({ message:'¿Vaciar carrito?' })) cart.clear(); }}
-          >
-            Vaciar
-          </Button>
-          <Button 
-            variant="primary" 
-            size="small" 
-            disabled={!cart.canSell || cart.lines.length===0} 
-            onClick={()=>finalizar(false)}
-          >
-            Finalizar
-          </Button>
-          {services.auth.hasPermission('KITCHEN_PRINT') && 
-            <Button 
-              variant="outline" 
-              size="small" 
-              disabled={!cart.canSell || cart.lines.length===0} 
-              onClick={()=>finalizar(true)}
-            >
-              Finalizar + Comanda
+        <ProfessionalCart
+          items={cart.lines.map(line => ({
+            id: line.productId,
+            productId: line.productId,
+            name: line.name,
+            qty: line.qty,
+            unitPrice: line.unitPrice,
+            lineTotal: line.lineTotal,
+            category: undefined, // Podemos agregar esto más tarde si necesario
+            lineTaxes: line.lineTaxes ?? []
+          }))}
+          summary={cart.cartSummary}
+          onChangeQty={async (id, delta) => {
+            try {
+              await cart.changeQty(id, delta);
+            } catch (error) {
+              console.error('Error changing quantity:', error);
+            }
+          }}
+          onRemoveItem={(id) => cart.removeLine(id)}
+          onClear={async () => {
+            if (await confirm({ message: '¿Vaciar carrito?' })) {
+              cart.clear();
+            }
+          }}
+          disabled={!cart.canSell}
+        />
+
+        {/* Action Buttons */}
+        <div className="cart-actions">
+          <div className="cart-action-row">
+            <Button variant="outline" size="small" onClick={()=>setShowDiscounts(true)}>
+              Descuentos ({cart.discounts.length})
             </Button>
-          }
+            <Button variant="outline" size="small" onClick={()=>setShowPayments(true)}>
+              Pagos ({cart.payments.length})
+            </Button>
+          </div>
+          
+          <div className="cart-action-row">
+            <Button 
+              variant="primary" 
+              size="medium"
+              disabled={!cart.canSell || cart.lines.length===0} 
+              onClick={()=>finalizar(false)}
+              style={{ flex: 1 }}
+            >
+              💰 Finalizar
+            </Button>
+            {services.auth.hasPermission('KITCHEN_PRINT') && (
+              <Button 
+                variant="outline" 
+                size="medium"
+                disabled={!cart.canSell || cart.lines.length===0} 
+                onClick={()=>finalizar(true)}
+                title="Finalizar e imprimir comanda"
+              >
+                🍽️
+              </Button>
+            )}
+          </div>
         </div>
-        <div style={{marginTop:'.8rem'}}>
-          <h3 style={{fontSize:'.8rem'}}>Cliente</h3>
-          <div style={{display:'flex', gap:'.4rem', marginTop:'.3rem'}}>
+
+        {/* Customer Section */}
+        <div className="cart-customer-section">
+          <h3 className="cart-customer-title">👤 Cliente</h3>
+          <div className="cart-customer-controls">
             <Input 
-              placeholder="Celular" 
+              placeholder="Número de celular" 
               value={phone} 
               onChange={e=>setPhone(e.target.value)} 
               variant="outline"
               size="small"
             />
-            <Button variant="outline" size="small" onClick={buscarCliente}>Buscar</Button>
-            <Button variant="outline" size="small" onClick={nuevoCliente}>Nuevo</Button>
+            <Button variant="outline" size="small" onClick={buscarCliente}>
+              Buscar
+            </Button>
+            <Button variant="outline" size="small" onClick={nuevoCliente}>
+              Nuevo
+            </Button>
           </div>
-          <div style={{fontSize:'.6rem', marginTop:'.3rem'}}>
-            {cart.customer ? (<div><strong>{cart.customer.name}</strong><br />{cart.customer.address} - {cart.customer.barrio}</div>) : 'Sin cliente' }
+          <div className="cart-customer-info">
+            {cart.customer ? (
+              <div className="customer-details">
+                <strong>{cart.customer.name}</strong>
+                <span>{cart.customer.address} - {cart.customer.barrio}</span>
+              </div>
+            ) : (
+              <span className="no-customer">Sin cliente seleccionado</span>
+            )}
           </div>
         </div>
       </aside>

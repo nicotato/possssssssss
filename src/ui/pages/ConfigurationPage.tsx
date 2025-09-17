@@ -8,9 +8,6 @@ export const ConfigurationPage: React.FC = () => {
   const { services } = useAppState();
   const [config, setConfig] = useState<SystemConfig['printer']>({
     preferredMode: 'auto',
-    escposEnabled: true,
-    windowEnabled: true,
-    usbEnabled: false,
     fallbackWindow: true
   });
   const [isTestPrinting, setIsTestPrinting] = useState(false);
@@ -123,62 +120,30 @@ export const ConfigurationPage: React.FC = () => {
               <option value="window">Ventana de Navegador</option>
             </select>
             <small className="form-help">
-              • <strong>Automático:</strong> Detecta automáticamente la mejor opción disponible<br/>
-              • <strong>ESC/POS:</strong> Para impresoras térmicas compatibles con comandos ESC/POS<br/>
-              • <strong>Ventana:</strong> Abre una ventana del navegador para imprimir
+              • <strong>Automático:</strong> Intenta ESC/POS → impresoras dedicadas → ventana (respaldo inteligente)<br/>
+              • <strong>ESC/POS:</strong> Solo impresora térmica ESC/POS (modo estricto, falla si no está disponible)<br/>
+              • <strong>Ventana:</strong> Siempre usa ventana del navegador (modo simple)
             </small>
           </div>
 
           <div className="form-group">
-            <label className="checkbox-label">
-              <Input
+            <div className="checkbox-container">
+              <input
                 type="checkbox"
-                checked={config.escposEnabled}
-                onChange={(e) => handleConfigChange('escposEnabled', e.target.checked)}
-                variant="outline"
-              />
-              <span>Habilitar impresora ESC/POS</span>
-            </label>
-            <small className="form-help">Activa el soporte para impresoras térmicas con comandos ESC/POS</small>
-          </div>
-
-          <div className="form-group">
-            <label className="checkbox-label">
-              <Input
-                type="checkbox"
-                checked={config.windowEnabled}
-                onChange={(e) => handleConfigChange('windowEnabled', e.target.checked)}
-                variant="outline"
-              />
-              <span>Habilitar impresión por ventana</span>
-            </label>
-            <small className="form-help">Permite imprimir abriendo una ventana del navegador</small>
-          </div>
-
-          <div className="form-group">
-            <label className="checkbox-label">
-              <Input
-                type="checkbox"
-                checked={config.usbEnabled}
-                onChange={(e) => handleConfigChange('usbEnabled', e.target.checked)}
-                variant="outline"
-              />
-              <span>Habilitar impresora USB</span>
-            </label>
-            <small className="form-help">Soporte para impresoras USB directas (requiere WebUSB)</small>
-          </div>
-
-          <div className="form-group">
-            <label className="checkbox-label">
-              <Input
-                type="checkbox"
+                id="fallbackWindow"
                 checked={config.fallbackWindow}
                 onChange={(e) => handleConfigChange('fallbackWindow', e.target.checked)}
-                variant="outline"
+                className="checkbox-input"
               />
-              <span>Usar ventana como respaldo</span>
-            </label>
-            <small className="form-help">Si no hay impresora disponible, abrir ventana automáticamente</small>
+              <label htmlFor="fallbackWindow" className="checkbox-label">
+                <span className="checkbox-custom"></span>
+                <span className="checkbox-text">Usar ventana como respaldo</span>
+              </label>
+            </div>
+            <small className="form-help">
+              Solo para <strong>modo ESC/POS</strong>: si la impresora térmica falla, abrir ventana automáticamente. 
+              <br/>En modo <strong>Automático</strong> ya incluye respaldo inteligente.
+            </small>
           </div>
 
           <div className="form-actions">

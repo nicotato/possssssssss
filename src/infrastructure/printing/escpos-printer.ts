@@ -71,7 +71,9 @@ export class EscPosPrinter {
       const b64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
       await fetch(this.gatewayUrl, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ data:b64 }) });
     } else {
-      console.warn('No hay destino de impresión configurado.');
+      const error = 'No hay destino de impresión configurado.';
+      console.warn(error);
+      throw new Error(error);
     }
   }
   private encodeText(str:string) { return new TextEncoder().encode(str); }

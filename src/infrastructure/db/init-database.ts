@@ -20,6 +20,7 @@ import { stockMovementSchema } from './schemas/stock-movement.schema.ts';
 import { productPriceHistorySchema } from './schemas/currency-price-history.schema.ts';
 import { simulationRunSchema } from './schemas/simulation-run.schema.ts';
 import { priceExperimentSchema } from './schemas/price-experiment.schema.ts';
+import { taxSchema } from './schemas/tax-schema.js';
 
 // Migration strategies existentes
 import { orderMigrationStrategies } from './migrations/order.migrations.ts';
@@ -60,6 +61,9 @@ export async function initDatabaseV7() {
         migrationStrategies: userMigrationStrategies
       },
       roles: { schema: roleSchema },
+
+      // Impuestos
+      taxes: { schema: taxSchema },
 
       // Auditoría y sincronización
       audit_logs: { schema: auditLogSchema },

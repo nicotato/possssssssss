@@ -5,10 +5,24 @@ export interface RoleDTO { id:string; name:string; description?:string; permissi
 export interface UserDTO { id:string; username:string; roleId:string; active:boolean; mustChangePassword?:boolean; }
 export interface ProductDTO { id:string; name:string; category?:string; basePrice:number; img?:string; active:boolean; createdAt?:string; }
 export interface OrderLineDTO { productId:string; name:string; qty:number; unitPrice:number; lineTotal:number; }
+export interface TaxLineDTO { code:string; name:string; base:number; rate:number; amount:number; scope:'line'|'global'; }
 export interface DiscountDTO { type:string; value:number; label?:string; }
 export interface PaymentDTO { method:string; amount:number; }
 export interface CustomerDTO { phone:string; name:string; address?:string; barrio?:string; }
-export interface OrderDTO { id:string; createdAt:string; status:string; lines:OrderLineDTO[]; discounts:DiscountDTO[]; payments:PaymentDTO[]; customer?: CustomerDTO; total:number; }
+export interface OrderDTO { 
+  id:string; 
+  createdAt:string; 
+  status:string; 
+  lines:OrderLineDTO[]; 
+  taxLines?:TaxLineDTO[];
+  taxTotal?:number;
+  discounts:DiscountDTO[]; 
+  payments:PaymentDTO[]; 
+  customer?: CustomerDTO;
+  customerName?:string;
+  customerPhone?:string; 
+  total:number; 
+}
 export interface AuthService {
   isAuthenticated(): boolean;
   isFullyAuthenticated?(): boolean;
@@ -104,6 +118,16 @@ export interface CostVarianceReportService {
   summary(from: string, to: string): Promise<{ count: number; totalVariance: number; top: { name: string; variance: number }[] }>;
 }
 
+export interface TaxService {
+  getAllTaxes(): Promise<any[]>;
+  getActiveTaxes(): Promise<any[]>;
+  createTax(tax: any): Promise<any>;
+  updateTax(id: string, updates: any): Promise<any>;
+  deleteTax(id: string): Promise<void>;
+  permanentlyDeleteTax(id: string): Promise<void>;
+  createDefaultTaxes(): Promise<void>;
+}
+
 export interface ServicesRegistry {
   costVarianceReport: CostVarianceReportService;
   analytics: AnalyticsService;
@@ -115,6 +139,7 @@ export interface ServicesRegistry {
   cart: CartService;
   audit: AuditService;
   reports: ReportsService;
+  tax: TaxService;
   config?: any; // ConfigurationService
   printer?: InvoicePrinter;
   kitchenPrinter?: KitchenPrinter;

@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useServices, useRepos } from './useServices.ts';
 import type { OrderLineDTO, DiscountDTO, PaymentDTO, PricingResult, PaymentStatus, CustomerDTO, OrderDTO } from '../types/services.d.ts';
+import type { CartSummary } from '../../application/services/cart-service';
 
 export interface CartLine extends OrderLineDTO {}
 export interface DiscountDraft extends DiscountDTO {}
@@ -8,16 +9,20 @@ export interface PaymentDraft extends PaymentDTO {}
 
 export interface UseCartResult {
   lines: CartLine[];
-  discounts: DiscountDraft[]; payments: PaymentDraft[];
+  discounts: DiscountDraft[]; 
+  payments: PaymentDraft[];
   subTotal: number;
+  cartSummary: CartSummary;
   pricing: PricingResult;
   payment: PaymentStatus;
   addProduct(id:string):Promise<void>;
-  changeQty(pid:string, delta:number):void;
+  changeQty(pid:string, delta:number):Promise<void>;
   removeLine(pid:string):void;
   clear():void;
-  addDiscount(d:DiscountDraft):void; removeDiscount(idx:number):void;
-  addPayment(p:PaymentDraft):void; removePayment(idx:number):void;
+  addDiscount(d:DiscountDraft):void; 
+  removeDiscount(idx:number):void;
+  addPayment(p:PaymentDraft):void; 
+  removePayment(idx:number):void;
   findCustomer(phone:string):Promise<CustomerDTO|null>;
   createCustomer(data:CustomerDTO):Promise<CustomerDTO|undefined>;
   customer:CustomerDTO|null;
@@ -36,16 +41,19 @@ export function useCart(): UseCartResult {
   const [status, setStatus] = useState<'idle'|'finalizing'>('idle');
 
   const lines:CartLine[] = cart.toArray();
-  const subTotal = cart.total();
+  const cartSummary = cart.getSummary();
+  const subTotal = cartSummary.subtotal;
   const pricingCalc = useMemo(()=> pricing.calculate(lines, discounts), [lines, discounts, pricing]);
   const paymentCalc = useMemo(()=> pricing.evaluatePaymentStatus(pricingCalc.grandTotal, payments), [pricingCalc, payments, pricing]);
 
   const addProduct = useCallback(async (id:string)=>{
     const doc = await repos.products.findById(id); if(!doc) return;
-    cart.addProduct(doc.toJSON());
+    await cart.addProduct(doc.toJSON());
   },[cart, repos.products]);
 
-  const changeQty = useCallback((pid:string, delta:number)=>{ cart.changeQty(pid, delta); },[cart]);
+  const changeQty = useCallback(async (pid:string, delta:number)=>{ 
+    await cart.changeQty(pid, delta); 
+  },[cart]);
   const removeLine = useCallback((pid:string)=>{ cart.remove(pid); },[cart]);
   const clear = useCallback(()=>{ cart.clear(); },[cart]);
 
@@ -93,10 +101,24 @@ export function useCart(): UseCartResult {
     }
   };
 
+  // Fallback para compatibilidad con el servicio JS actual
+  const cartSummaryFallback: CartSummary = {
+    subtotal: subTotal || 0,
+    lineTaxes: [],
+    globalTaxes: [],
+    totalTax: 0,
+    total: subTotal || 0,
+    lineCount: lines.length,
+    itemCount: lines.reduce((acc, line) => acc + (line.qty || 0), 0)
+  };
+
+  const actualCartSummary = (cart as any).getSummary ? (cart as any).getSummary() : cartSummaryFallback;
+
   return {
     lines,
     discounts, payments,
     subTotal,
+    cartSummary: actualCartSummary,
     pricing: pricingCalc,
     payment: paymentCalc,
     addProduct, changeQty, removeLine, clear,
