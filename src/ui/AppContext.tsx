@@ -7,12 +7,20 @@ export interface CustomersRepo { findByPhone(phone:string):Promise<CustomerDTO|u
 export interface OrdersRepo { listRecent(limit:number):Promise<OrderDTO[]>; findById(id:string):Promise<OrderDTO|undefined>; }
 export interface RolesRepo { getAll?():Promise<RoleDTO[]>; }
 export interface UsersRepo { getAll?():Promise<UserDTO[]>; }
+export interface WasteRepo { col:any; }
+export interface IngredientsRepo { col:any; }
+export interface PromotionsRepo { col:any; active?(location:string):Promise<any[]>; }
+export interface PriceExperimentsRepo { col:any; }
 export interface Repos {
   products: ProductsRepo;
   customers?: CustomersRepo;
   orders?: OrdersRepo;
   roles?: RolesRepo;
   users?: UsersRepo;
+  waste?: WasteRepo;
+  ingredients?: IngredientsRepo;
+  promotions?: PromotionsRepo;
+  priceExperiments?: PriceExperimentsRepo;
 }
 export interface AppStateValue {
   services: ServicesRegistry;

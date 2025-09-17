@@ -147,6 +147,21 @@ export interface TaxService {
   deleteTax(id: string): Promise<void>;
   permanentlyDeleteTax(id: string): Promise<void>;
   createDefaultTaxes(): Promise<void>;
+  calculate?(lines: OrderLineDTO[]): Promise<TaxCalculation[]>;
+}
+
+export interface WasteService {
+  reportWaste(data: { ingredientId: string; qty: number; reason: string; notes?: string }): Promise<any>;
+  getWasteHistory(limit?: number): Promise<any[]>;
+}
+
+export interface PriceExperimentService {
+  recordExperiment(data: { productId: string; scenarios: any[]; base: any }): Promise<any>;
+  getExperiments(limit?: number): Promise<any[]>;
+}
+
+export interface PromotionService {
+  applyPromotions?(lines: OrderLineDTO[], activePromotions: any[]): Promise<any>;
 }
 
 export interface ServicesRegistry {
@@ -161,6 +176,9 @@ export interface ServicesRegistry {
   audit: AuditService;
   reports: ReportsService;
   tax: TaxService;
+  waste?: WasteService;
+  priceExperiments?: PriceExperimentService;
+  promotions?: PromotionService;
   config?: any; // ConfigurationService
   printer?: InvoicePrinter;
   kitchenPrinter?: KitchenPrinter;

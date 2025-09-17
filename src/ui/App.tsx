@@ -21,6 +21,10 @@ import { TaxManagementPage } from './pages/TaxManagementPage.tsx';
 import { FormDemoPage } from './pages/FormDemoPage.tsx';
 import { ComponentsDemo } from './pages/ComponentsDemo.tsx';
 import { LoginModernExample } from './pages/LoginModernExample.tsx';
+import WastePage from './pages/WastePage.tsx';
+import PromotionsPage from './pages/PromotionsPage.tsx';
+import PromoSimPage from './pages/PromoSimPage.tsx';
+import PriceExperimentsPage from './pages/PriceExperimentsPage.tsx';
 import { useAppState } from './AppContext.tsx';
 
 const Protected: React.FC<{children: React.ReactNode}> = ({ children }) => {
@@ -77,6 +81,10 @@ export const App: React.FC = () => {
                 <Route path="/menu" element={<Protected><MenuPage /></Protected>} />
                 <Route path="/ventas" element={<Protected><VentasPage /></Protected>} />
                 <Route path="/ordenes" element={<Protected><OrdersAdminPage /></Protected>} />
+                <Route path="/promociones" element={<Protected><PromotionsPage /></Protected>} />
+                <Route path="/promo-sim" element={<Protected><PromoSimPage /></Protected>} />
+                <Route path="/price-experiments" element={<Protected><PriceExperimentsPage /></Protected>} />
+                <Route path="/merma" element={<Protected><WastePage /></Protected>} />
                 <Route path="/roles" element={<Protected><RolesPage /></Protected>} />
                 <Route path="/usuarios" element={<Protected><UsersPage /></Protected>} />
                 <Route path="/reportes" element={<Protected><ReportsPage /></Protected>} />

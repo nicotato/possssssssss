@@ -7,6 +7,8 @@ import { RxRoleRepository } from '../infrastructure/repositories/rx-role-reposit
 import { RxAuditRepository } from '../infrastructure/repositories/rx-audit-repository.js';
 import { RxSyncQueueRepository } from '../infrastructure/repositories/rx-sync-queue-repository.js';
 import { RxTaxRepository } from '../infrastructure/repositories/rx-tax-repository.js';
+import { RxPromotionRepository } from '../infrastructure/repositories/rx-promotion-repository.js';
+import { RxPriceExperimentRepository } from '../infrastructure/repositories/rx-price-experiment-repository.ts';
 
 import { CartService } from '../application/services/cart-service.ts';
 import { OrderService } from '../application/services/order-service.js';
@@ -20,6 +22,8 @@ import { PricingService } from '../application/services/pricing-service.js';
 import { PrintingService } from '../application/services/printing-service.js';
 import { ConfigurationService } from '../application/services/configuration-service.ts';
 import { TaxService } from '../application/services/tax-service.ts';
+import { WasteService } from '../application/services/waste-service.js';
+import { PriceExperimentService } from '../application/services/price-experiment-service.ts';
 import { KitchenPrinter } from '../infrastructure/printing/kitchen-printer.ts';
 import { EscPosPrinter } from '../infrastructure/printing/escpos-printer.ts';
 import { RemoteAdapter } from '../infrastructure/sync/remote-adapter.js';
@@ -41,7 +45,12 @@ export async function createAppEnvironment() {
       roles: new RxRoleRepository(db),
       audit: new RxAuditRepository(db),
       queue: new RxSyncQueueRepository(db),
-      taxes: new RxTaxRepository(db)
+      taxes: new RxTaxRepository(db),
+      promotions: new RxPromotionRepository(db),
+      priceExperiments: new RxPriceExperimentRepository(db),
+      // Note: waste repo would need to be created, using ingredients for now
+      ingredients: db.ingredients ? { col: db.ingredients } : null,
+      waste: db.waste ? { col: db.waste } : null
     };
     console.log('[Bootstrap] Repositorios creados');
 
@@ -95,6 +104,14 @@ export async function createAppEnvironment() {
     services.users = new UserService(repos.users, services.auth, services.audit);
     services.reports = new ReportService(repos.orders);
     services.sync = new SyncService(new RemoteAdapter('https://example-sync-server.test', async ()=> 'demo-token'), repos.orders, repos.products, repos.users, services.audit, repos.queue);
+    
+    // Servicios adicionales
+    if (repos.waste && repos.ingredients) {
+      services.waste = new WasteService(repos.waste, repos.ingredients, services.audit, services.auth);
+    }
+    if (repos.priceExperiments) {
+      services.priceExperiments = new PriceExperimentService(repos.priceExperiments, services.auth, services.audit);
+    }
     
     console.log('[Bootstrap] Todos los servicios creados exitosamente');
     return { db, repos, services };
