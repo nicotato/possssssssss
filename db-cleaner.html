@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Base de Datos - POS</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #f9fafb;
+        }
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .btn {
+            background: #f77f00;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #e76b00;
+        }
+        .btn-danger {
+            background: #dc2626;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        .status {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 6px;
+            display: none;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .status.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🗃️ Herramientas de Base de Datos</h1>
+        <p>Utiliza estas herramientas para limpiar y reinicializar la base de datos local del POS.</p>
+        
+        <div id="status" class="status"></div>
+        
+        <div>
+            <button class="btn btn-danger" onclick="clearDatabase()">
+                🧹 Limpiar Base de Datos Completa
+            </button>
+            <button class="btn" onclick="goToPOS()">
+                🍕 Ir al POS
+            </button>
+        </div>
+        
+        <div style="margin-top: 2rem; text-align: left; background: #f9fafb; padding: 1rem; border-radius: 6px;">
+            <h3>ℹ️ ¿Cuándo usar esto?</h3>
+            <ul>
+                <li><strong>Login no funciona:</strong> Usuarios no encontrados</li>
+                <li><strong>No hay productos:</strong> Menú vacío</li>
+                <li><strong>Datos corruptos:</strong> Errores extraños</li>
+                <li><strong>Reset completo:</strong> Volver al estado inicial</li>
+            </ul>
+            
+            <h3>📋 Credenciales después del reset:</h3>
+            <ul>
+                <li><strong>Admin:</strong> admin / admin123</li>
+                <li><strong>Cajero:</strong> caja / caja123</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.textContent = message;
+            status.style.display = 'block';
+        }
+
+        async function clearDatabase() {
+            if (!confirm('¿Estás seguro? Esto eliminará TODOS los datos locales.')) {
+                return;
+            }
+
+            showStatus('🧹 Limpiando base de datos...', 'info');
+
+            try {
+                // Limpiar IndexedDB
+                if ('indexedDB' in window) {
+                    const dbNames = ['pos_pizzeria_v7', 'pos_pizzeria', 'pos-db', 'rxdb-pos'];
+                    
+                    for (const dbName of dbNames) {
+                        try {
+                            await new Promise((resolve, reject) => {
+                                const deleteReq = indexedDB.deleteDatabase(dbName);
+                                deleteReq.onsuccess = () => resolve(true);
+                                deleteReq.onerror = () => resolve(false); // No error, just not found
+                                deleteReq.onblocked = () => {
+                                    setTimeout(() => resolve(false), 1000);
+                                };
+                            });
+                            console.log(`✅ DB ${dbName} eliminada`);
+                        } catch (e) {
+                            console.log(`⚠️ DB ${dbName} no encontrada`);
+                        }
+                    }
+                }
+
+                // Limpiar localStorage
+                if ('localStorage' in window) {
+                    const keysToRemove = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && (key.includes('pos') || key.includes('rxdb') || key.includes('cart') || key.includes('auth'))) {
+                            keysToRemove.push(key);
+                        }
+                    }
+                    
+                    keysToRemove.forEach(key => {
+                        localStorage.removeItem(key);
+                        console.log(`🗑️ Removed localStorage: ${key}`);
+                    });
+                }
+
+                // Limpiar sessionStorage
+                if ('sessionStorage' in window) {
+                    const keysToRemove = [];
+                    for (let i = 0; i < sessionStorage.length; i++) {
+                        const key = sessionStorage.key(i);
+                        if (key && (key.includes('pos') || key.includes('rxdb') || key.includes('cart') || key.includes('auth'))) {
+                            keysToRemove.push(key);
+                        }
+                    }
+                    
+                    keysToRemove.forEach(key => {
+                        sessionStorage.removeItem(key);
+                        console.log(`🗑️ Removed sessionStorage: ${key}`);
+                    });
+                }
+
+                showStatus('✅ Base de datos limpiada. Redirigiendo al POS...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'http://localhost:5174/';
+                }, 2000);
+
+            } catch (error) {
+                showStatus('❌ Error al limpiar: ' + error.message, 'danger');
+                console.error('Error limpiando DB:', error);
+            }
+        }
+
+        function goToPOS() {
+            window.location.href = 'http://localhost:5174/';
+        }
+    </script>
+</body>
+</html>

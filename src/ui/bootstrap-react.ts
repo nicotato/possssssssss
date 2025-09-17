@@ -149,23 +149,45 @@ async function seedCriticalData(db: any) {
       console.log('[SEED-CRITICAL] Roles creados exitosamente');
     }
 
-    // Verificar usuario admin
+    // Verificar usuarios de prueba
     if (db.collections?.users) {
-      const adminExists = await db.users.findOne({selector: {email: 'admin@pos.local'}}).exec();
-      if (!adminExists) {
-        console.log('[SEED-CRITICAL] Creando usuario admin...');
+      const usersCount = await db.users.count().exec();
+      if (usersCount === 0) {
+        console.log('[SEED-CRITICAL] Creando usuarios de prueba...');
         try {
+          // Hash simple para usuarios de prueba (SHA-256)
+          const hash = async (str:string) => {
+            const enc = new TextEncoder().encode(str);
+            const dig = await crypto.subtle.digest('SHA-256', enc);
+            return Array.from(new Uint8Array(dig)).map(b=>b.toString(16).padStart(2,'0')).join('');
+          };
+
+          const adminHash = await hash('admin123');
+          const cajaHash = await hash('caja123');
+
           await db.users.insert({
-            id: 'admin-001',
-            email: 'admin@pos.local',
-            password: '$2a$10$somehashedpassword',
+            id: 'u_admin',
+            username: 'admin',
+            passwordHash: adminHash,
             name: 'Administrador',
-            roles: ['admin'],
-            isActive: true
+            roleId: 'r_admin',
+            active: true,
+            createdAt: new Date().toISOString()
           });
-          console.log('[SEED-CRITICAL] Usuario admin creado');
+
+          await db.users.insert({
+            id: 'u_caja',
+            username: 'caja',
+            passwordHash: cajaHash,
+            name: 'Cajero',
+            roleId: 'r_cajero', 
+            active: true,
+            createdAt: new Date().toISOString()
+          });
+
+          console.log('[SEED-CRITICAL] Usuarios de prueba creados: admin/admin123, caja/caja123');
         } catch (e: any) {
-          if (e.code !== 'RXDB_DUPE') console.warn('[SEED-CRITICAL] Error creando admin:', e);
+          if (e.code !== 'RXDB_DUPE') console.warn('[SEED-CRITICAL] Error creando usuarios:', e);
         }
       }
     }
@@ -179,28 +201,44 @@ async function seedOptionalData(db: any) {
   try {
     console.log('[SEED-OPTIONAL] Iniciando datos opcionales...');
     
+    // Skip product cleanup in optional seeding to avoid race condition with seedCriticalData
     // Force refresh products in development (safe clear)
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      try {
-        if (db.collections?.products) {
-          const all = await db.products.find().exec();
-          for (const doc of all) {
-            try { await doc.remove(); } catch (e) { /* ignore individual */ }
-          }
-          console.log('[SEED-OPTIONAL] Productos limpiados (dev)');
-        }
-      } catch (e) {
-        console.warn('[SEED-OPTIONAL] Falló limpieza de productos dev', e);
-      }
-    }
+    // if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    //   try {
+    //     if (db.collections?.products) {
+    //       const all = await db.products.find().exec();
+    //       for (const doc of all) {
+    //         try { await doc.remove(); } catch (e) { /* ignore individual */ }
+    //       }
+    //       console.log('[SEED-OPTIONAL] Productos limpiados (dev)');
+    //     }
+    //   } catch (e) {
+    //     console.warn('[SEED-OPTIONAL] Falló limpieza de productos dev', e);
+    //   }
+    // }
 
     // Seed productos si no existen
     if (db.collections?.products) {
       const productsExisting = await db.products.find().exec();
       if (productsExisting.length === 0) {
         console.log('[SEED-OPTIONAL] Creando productos de ejemplo...');
-        // Aquí iría el seeding de productos...
-        console.log('[SEED-OPTIONAL] Productos creados');
+        
+        const sampleProducts = [
+          { id: 'pizza-margherita', name: 'Pizza Margherita', basePrice: 1200, category: 'Pizzas', active: true, createdAt: new Date().toISOString() },
+          { id: 'pizza-pepperoni', name: 'Pizza Pepperoni', basePrice: 1400, category: 'Pizzas', active: true, createdAt: new Date().toISOString() },
+          { id: 'pizza-hawaiana', name: 'Pizza Hawaiana', basePrice: 1500, category: 'Pizzas', active: true, createdAt: new Date().toISOString() },
+          { id: 'empanada-carne', name: 'Empanada de Carne', basePrice: 300, category: 'Empanadas', active: true, createdAt: new Date().toISOString() },
+          { id: 'empanada-pollo', name: 'Empanada de Pollo', basePrice: 300, category: 'Empanadas', active: true, createdAt: new Date().toISOString() },
+          { id: 'gaseosa-cola', name: 'Gaseosa Cola 500ml', basePrice: 400, category: 'Bebidas', active: true, createdAt: new Date().toISOString() },
+          { id: 'agua-mineral', name: 'Agua Mineral 500ml', basePrice: 250, category: 'Bebidas', active: true, createdAt: new Date().toISOString() },
+          { id: 'pizza-cuatro-quesos', name: 'Pizza Cuatro Quesos', basePrice: 1600, category: 'Pizzas', active: true, createdAt: new Date().toISOString() }
+        ];
+
+        for (const productData of sampleProducts) {
+          await db.products.insert(productData);
+        }
+        
+        console.log('[SEED-OPTIONAL] Productos creados:', sampleProducts.length);
       }
     }
   } catch (error) {

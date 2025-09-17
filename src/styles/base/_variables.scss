@@ -44,6 +44,17 @@
   --bg-tertiary: var(--color-gray-100);
   --bg-overlay: rgba(0, 0, 0, 0.5);
 
+  // Sistema de superficies (Material Design inspired)
+  --color-surface: var(--color-white);
+  --color-surface-variant: var(--color-gray-50);
+  --color-surface-muted: var(--color-gray-100);
+  --color-surface-accent: var(--color-primary-light);
+
+  // Colores de borde
+  --border-color: var(--color-gray-200);
+  --border-color-light: var(--color-gray-100);
+  --border-color-dark: var(--color-gray-300);
+
   // Sistema de espaciado (8px base)
   --spacing-xs: 0.25rem;  // 4px
   --spacing-sm: 0.5rem;   // 8px
@@ -77,8 +88,8 @@
 
   // Sistema de bordes y radios
   --border-width-thin: 1px;
-  --border-width-thick: 2px;
-  --border-color: var(--color-gray-200);
+  --border-width-md: 2px;
+  --border-width-thick: 3px;
   --border-color-focus: var(--color-primary);
 
   --border-radius-sm: 0.25rem;   // 4px

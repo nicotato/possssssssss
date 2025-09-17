@@ -244,19 +244,23 @@ export const MenuPage: React.FC = () => {
         <div className="cart-customer-section">
           <h3 className="cart-customer-title">👤 Cliente</h3>
           <div className="cart-customer-controls">
-            <Input 
-              placeholder="Número de celular" 
-              value={phone} 
-              onChange={e=>setPhone(e.target.value)} 
-              variant="outline"
-              size="small"
-            />
-            <Button variant="outline" size="small" onClick={buscarCliente}>
-              Buscar
-            </Button>
-            <Button variant="outline" size="small" onClick={nuevoCliente}>
-              Nuevo
-            </Button>
+            <div className="cart-customer-input-row">
+              <Input 
+                placeholder="Número de celular" 
+                value={phone} 
+                onChange={e=>setPhone(e.target.value)} 
+                variant="outline"
+                size="small"
+              />
+            </div>
+            <div className="cart-customer-buttons-row">
+              <Button variant="outline" size="small" onClick={buscarCliente}>
+                Buscar
+              </Button>
+              <Button variant="outline" size="small" onClick={nuevoCliente}>
+                Nuevo
+              </Button>
+            </div>
           </div>
           <div className="cart-customer-info">
             {cart.customer ? (
