@@ -1,0 +1,20 @@
+# Node / General
+node_modules
+dist
+coverage
+*.log
+
+# Editor
+.vscode
+.idea
+
+# System
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.tsbuildinfo
+
+# Env
+.env
+.env.local
