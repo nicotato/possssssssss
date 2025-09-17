@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useServices, useRepos } from './useServices.ts';
 import type { OrderLineDTO, DiscountDTO, PaymentDTO, PricingResult, PaymentStatus, CustomerDTO, OrderDTO } from '../types/services.d.ts';
-import type { CartSummary } from '../../application/services/cart-service';
+import type { CartSummary } from '../../application/services/cart-service.js';
 
 export interface CartLine extends OrderLineDTO {}
 export interface DiscountDraft extends DiscountDTO {}

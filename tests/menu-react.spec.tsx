@@ -26,6 +26,15 @@ const createMockServices = () => ({
   },
   users: { list: vi.fn().mockResolvedValue([]), changeRole: vi.fn(), deactivate: vi.fn(), create: vi.fn() },
   roles: { list: vi.fn().mockResolvedValue([]), updateRole: vi.fn(), createRole: vi.fn() },
+  tax: {
+    getAllTaxes: vi.fn().mockResolvedValue([]),
+    getActiveTaxes: vi.fn().mockResolvedValue([]),
+    createTax: vi.fn().mockResolvedValue({}),
+    updateTax: vi.fn().mockResolvedValue({}),
+    deleteTax: vi.fn().mockResolvedValue(undefined),
+    permanentlyDeleteTax: vi.fn().mockResolvedValue(undefined),
+    createDefaultTaxes: vi.fn().mockResolvedValue(undefined)
+  },
   orders: { 
     finalizeSale: vi.fn().mockResolvedValue({ id: '1', total: 50 }),
     cancelOrder: vi.fn(),
@@ -40,6 +49,15 @@ const createMockServices = () => ({
   cart: { 
     toArray: vi.fn().mockReturnValue([]),
     total: vi.fn().mockReturnValue(50),
+    getSummary: vi.fn().mockReturnValue({
+      subtotal: 50,
+      lineTaxes: [],
+      globalTaxes: [],
+      totalTax: 0,
+      total: 50,
+      lineCount: 0,
+      itemCount: 0
+    }),
     addProduct: vi.fn(),
     changeQty: vi.fn(),
     remove: vi.fn(),

@@ -1,0 +1,172 @@
+// Variables globales del sistema de diseño
+// Siguiendo arquitectura hexagonal: dominio de diseño separado de la implementación
+
+// Colores del sistema
+:root {
+  // Colores primarios de la marca
+  --color-primary: #f77f00;
+  --color-primary-accent: #f77f00;
+  --color-primary-light: rgba(247, 127, 0, 0.1);
+  --color-primary-dark: #d66900;
+
+  // Colores de estado
+  --color-success: #28a745;
+  --color-success-light: #d4edda;
+  --color-warning: #ffc107;
+  --color-warning-light: #fff3cd;
+  --color-danger: #dc3545;
+  --color-danger-light: #f8d7da;
+  --color-info: #17a2b8;
+  --color-info-light: #d1ecf1;
+
+  // Escala de grises
+  --color-white: #ffffff;
+  --color-gray-50: #f8f9fa;
+  --color-gray-100: #e9ecef;
+  --color-gray-200: #dee2e6;
+  --color-gray-300: #ced4da;
+  --color-gray-400: #adb5bd;
+  --color-gray-500: #6c757d;
+  --color-gray-600: #495057;
+  --color-gray-700: #343a40;
+  --color-gray-800: #212529;
+  --color-black: #000000;
+
+  // Colores de texto
+  --text-primary: var(--color-gray-800);
+  --text-secondary: var(--color-gray-600);
+  --text-muted: var(--color-gray-500);
+  --text-inverse: var(--color-white);
+
+  // Colores de fondo
+  --bg-primary: var(--color-white);
+  --bg-secondary: var(--color-gray-50);
+  --bg-tertiary: var(--color-gray-100);
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+
+  // Sistema de espaciado (8px base)
+  --spacing-xs: 0.25rem;  // 4px
+  --spacing-sm: 0.5rem;   // 8px
+  --spacing-md: 1rem;     // 16px
+  --spacing-lg: 1.5rem;   // 24px
+  --spacing-xl: 2rem;     // 32px
+  --spacing-2xl: 3rem;    // 48px
+  --spacing-3xl: 4rem;    // 64px
+
+  // Sistema tipográfico
+  --font-family-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --font-size-xs: 0.75rem;   // 12px
+  --font-size-sm: 0.875rem;  // 14px
+  --font-size-base: 1rem;    // 16px
+  --font-size-lg: 1.125rem;  // 18px
+  --font-size-xl: 1.25rem;   // 20px
+  --font-size-2xl: 1.5rem;   // 24px
+  --font-size-3xl: 1.875rem; // 30px
+  --font-size-4xl: 2.25rem;  // 36px
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.75;
+
+  // Sistema de bordes y radios
+  --border-width-thin: 1px;
+  --border-width-thick: 2px;
+  --border-color: var(--color-gray-200);
+  --border-color-focus: var(--color-primary);
+
+  --border-radius-sm: 0.25rem;   // 4px
+  --border-radius-base: 0.375rem; // 6px
+  --border-radius-md: 0.5rem;    // 8px
+  --border-radius-lg: 0.75rem;   // 12px
+  --border-radius-xl: 1rem;      // 16px
+  --border-radius-full: 9999px;
+
+  // Sistema de sombras
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+  // Z-index scale
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+
+  // Transiciones
+  --transition-base: 150ms ease-in-out;
+  --transition-fast: 100ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+
+  // Puntos de quiebre responsivos
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1400px;
+}
+
+// Variables SCSS derivadas para compatibilidad
+$primary: var(--color-primary);
+$success: var(--color-success);
+$warning: var(--color-warning);
+$danger: var(--color-danger);
+$info: var(--color-info);
+
+$white: var(--color-white);
+$gray-100: var(--color-gray-100);
+$gray-200: var(--color-gray-200);
+$gray-300: var(--color-gray-300);
+$gray-400: var(--color-gray-400);
+$gray-500: var(--color-gray-500);
+$gray-600: var(--color-gray-600);
+$gray-700: var(--color-gray-700);
+$gray-800: var(--color-gray-800);
+$black: var(--color-black);
+
+$font-family-base: var(--font-family-base);
+$font-size-base: var(--font-size-base);
+$line-height-base: var(--line-height-base);
+
+$border-radius: var(--border-radius-base);
+$border-color: var(--border-color);
+
+$box-shadow: var(--shadow-base);
+$box-shadow-sm: var(--shadow-sm);
+$box-shadow-lg: var(--shadow-lg);
+
+$transition-base: var(--transition-base);
+
+// Breakpoints para mixins
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  2xl: 1400px
+);
+
+// Alias para utilidades
+$breakpoints: $grid-breakpoints;
+
+// Spacing scale para utilidades
+$spacing-scale: (
+  1: xs,
+  2: sm,
+  3: md,
+  4: lg,
+  5: xl,
+  6: 2xl
+);

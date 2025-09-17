@@ -12,12 +12,20 @@ export default defineConfig(({ mode, command }) => {
     base: process.env.NODE_ENV === 'production' ? '/possssssssss/' : '/',
     build: {
       sourcemap: true,
+      // Asegurar que CSS se extraiga en archivos separados
+      cssCodeSplit: true,
       rollupOptions: {
         output: {
           // Cache busting para archivos de producción
           entryFileNames: `assets/[name]-[hash].js`,
           chunkFileNames: `assets/[name]-[hash].js`,
-          assetFileNames: `assets/[name]-[hash].[ext]`,
+          assetFileNames: (assetInfo) => {
+            // CSS separado con nombrado específico
+            if (assetInfo.name?.endsWith('.css')) {
+              return `assets/[name]-[hash].css`;
+            }
+            return `assets/[name]-[hash].[ext]`;
+          },
           manualChunks: (id) => {
             if (id.includes('chevrotain')) return 'chevrotain';
             if (id.includes('rxdb')) return 'rxdb';
@@ -32,7 +40,24 @@ export default defineConfig(({ mode, command }) => {
         '@application': path.resolve(__dirname, 'src/application'),
         '@infrastructure': path.resolve(__dirname, 'src/infrastructure'),
         '@ui': path.resolve(__dirname, 'src/ui'),
-        '@workers': path.resolve(__dirname, 'src/workers')
+        '@workers': path.resolve(__dirname, 'src/workers'),
+        '@styles': path.resolve(__dirname, 'src/styles')
+      }
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          // Removido additionalData para migrar completamente a @use
+          // Cada archivo SCSS debe importar sus dependencias explícitamente
+          charset: false,
+          api: 'modern-compiler'
+        }
+      },
+      // PostCSS configuration para optimización
+      postcss: {
+        plugins: [
+          // Autoprefixer se incluye automáticamente
+        ]
       }
     },
     define: {

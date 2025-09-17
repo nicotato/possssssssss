@@ -19,6 +19,14 @@ function makeOrderRepo(){
   const docs:any[] = [];
   return {
     create: async (doc:any)=> { docs.push(doc); return doc; },
+    list: async (limit:number = 50)=> docs.slice(-limit),
+    listRecent: async (limit:number = 100)=> docs.slice(-limit),
+    findById: async (id:string)=> docs.find(d=>d.id===id) || null,
+    updateStatus: async (id:string, status:string)=> {
+      const doc = docs.find(d=>d.id===id);
+      if (doc) doc.status = status;
+      return doc;
+    },
     col: { findOne: (id:string)=> ({ exec: async ()=> docs.find(d=>d.id===id) ? { incrementalPatch: async(p:any)=> Object.assign(docs.find(d=>d.id===id), p) } : null }) }
   };
 }
@@ -27,8 +35,17 @@ function makeCart(lines:any[]){
   return {
     isEmpty: ()=> lines.length===0,
     toArray: ()=> lines,
+    getSummary: ()=> ({
+      subtotal: lines.reduce((a,l)=>a+l.unitPrice*l.qty,0),
+      lineTaxes: [],
+      globalTaxes: [],
+      totalTax: 0,
+      total: lines.reduce((a,l)=>a+l.unitPrice*l.qty,0),
+      lineCount: lines.length,
+      itemCount: lines.reduce((a,l)=>a+l.qty,0)
+    }),
     clear: ()=> { lines.length=0; }
-  };
+  } as any;
 }
 
 function makePricing(){
@@ -38,9 +55,13 @@ function makePricing(){
   };
 }
 
-const audit = { log: async()=>{} };
-const auth = { getUsername: ()=> 'tester' };
-const queue = { enqueue: async()=>{} };
+const audit = { 
+  log: async()=>{}, 
+  repo: null, 
+  list: async()=> [] 
+} as any;
+const auth = { getUsername: ()=> 'tester' } as any;
+const queue = { enqueue: async()=>{} } as any;
 
 // Stubs for simulation pipeline
 const promotionService = { applyPromotions: async (lines:any)=> ({ lines, promotionDiscountTotal:0, appliedPromotions:[] }) };

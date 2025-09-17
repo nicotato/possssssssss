@@ -67,12 +67,10 @@ export const App: React.FC = () => {
     <ToastProvider>
       <ConfirmProvider>
         <FormModalProvider>
-          <div className="layout">
+          <div className={`layout ${isDrawerOpen ? 'drawer-open' : ''}`}>
             <SideDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
-            <header className="navbar">
-              <NavBar onMenuToggle={toggleDrawer} />
-            </header>
-            <main>
+            <NavBar onMenuToggle={toggleDrawer} />
+            <main className="main">
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/productos" element={<Protected><ProductsPage /></Protected>} />

@@ -1,0 +1,107 @@
+// Punto de entrada principal para el sistema de estilos modular
+// Siguiendo arquitectura ITCSS (Inverted Triangle CSS) para escalabilidad
+
+// 1. BASE - Configuraciones, variables y mixins globales
+@use 'base/variables' as *;
+@use 'base/mixins' as *;
+@use 'base/reset';
+
+// 2. LAYOUTS - Sistemas de layout y grid
+@use 'layouts/grid';
+@use 'layouts/header';
+@use 'layouts/sidebar';
+@use 'layouts/main';
+
+// 3. COMPONENTS - Componentes reutilizables
+@use 'components/buttons';
+@use 'components/forms';
+@use 'components/cards';
+@use 'components/modals';
+@use 'components/tables';
+@use 'components/alerts';
+@use 'components/navigation';
+@use 'components/cart';
+
+// 4. UTILITIES - Clases utilitarias y helpers
+@use 'utils/utilities';
+@use 'legacy-compat';
+
+// Estilos específicos de la aplicación POS
+// Estos deberían ser los únicos estilos que no están componentizados
+.pos-app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding: var(--spacing-lg);
+  
+  @include respond-to(lg) {
+    padding: var(--spacing-xl);
+  }
+}
+
+// Estados globales de la aplicación
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--color-gray-200);
+    border-top: 4px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Error boundary styles
+.error-boundary {
+  padding: var(--spacing-xl);
+  text-align: center;
+  
+  h2 {
+    color: var(--color-danger);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .error-details {
+    background-color: var(--color-gray-100);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-base);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-md);
+    text-align: left;
+    overflow-x: auto;
+  }
+}
+
+// Responsive utilities que no están en utils
+@include respond-to(md) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+.hide-desktop {
+  @include respond-to(md) {
+    display: block !important;
+  }
+}

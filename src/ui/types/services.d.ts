@@ -4,8 +4,9 @@
 export interface RoleDTO { id:string; name:string; description?:string; permissions:string[]; }
 export interface UserDTO { id:string; username:string; roleId:string; active:boolean; mustChangePassword?:boolean; }
 export interface ProductDTO { id:string; name:string; category?:string; basePrice:number; img?:string; active:boolean; createdAt?:string; }
-export interface OrderLineDTO { productId:string; name:string; qty:number; unitPrice:number; lineTotal:number; }
+export interface OrderLineDTO { productId:string; name:string; qty:number; unitPrice:number; lineTotal:number; lineTaxes?:TaxCalculation[]; }
 export interface TaxLineDTO { code:string; name:string; base:number; rate:number; amount:number; scope:'line'|'global'; }
+export interface TaxCalculation { code:string; name:string; base:number; rate:number; amount:number; scope:'line'|'global'; }
 export interface DiscountDTO { type:string; value:number; label?:string; }
 export interface PaymentDTO { method:string; amount:number; }
 export interface CustomerDTO { phone:string; name:string; address?:string; barrio?:string; }
@@ -58,7 +59,27 @@ export interface OrdersService {
 export interface PricingResult { subTotal:number; discountTotal:number; grandTotal:number; }
 export interface PaymentStatus { amountPaid:number; paymentStatus:'PAID'|'PARTIAL'|'UNPAID'|'OVERPAID'; changeDue:number; }
 export interface PricingService { calculate(lines:OrderLineDTO[], discounts:DiscountDTO[]): PricingResult; evaluatePaymentStatus(total:number, payments:PaymentDTO[]): PaymentStatus; }
-export interface CartService { toArray():OrderLineDTO[]; total():number; addProduct(productId:string):void; changeQty(id:string,d:number):void; remove(id:string):void; clear():void; isEmpty():boolean; }
+
+export interface CartSummary {
+  subtotal: number;
+  lineTaxes: TaxCalculation[];
+  globalTaxes: TaxCalculation[];
+  totalTax: number;
+  total: number;
+  lineCount: number;
+  itemCount: number;
+}
+
+export interface CartService { 
+  toArray(): OrderLineDTO[]; 
+  total(): number; 
+  getSummary(): CartSummary; 
+  addProduct(productId: string): void; 
+  changeQty(id: string, d: number): void; 
+  remove(id: string): void; 
+  clear(): void; 
+  isEmpty(): boolean; 
+}
 export interface AuditService { log(action:string, details:any): Promise<void>; list?(limit:number):Promise<any[]>; }
 export interface SalesSummary { date:string; total:number; orders:number; }
 export interface TopProduct { productId:string; name:string; qty:number; revenue:number; }

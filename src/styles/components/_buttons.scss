@@ -1,0 +1,383 @@
+// Button component styles siguiendo design system
+// Sistema de botones escalable y accesible
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+.btn {
+  @include button-base;
+
+  // Variantes de color
+  &.btn-primary {
+    @include button-variant(var(--color-primary));
+  }
+
+  &.btn-secondary {
+    @include button-variant(var(--color-gray-600));
+  }
+
+  &.btn-success {
+    @include button-variant(var(--color-success));
+  }
+
+  &.btn-warning {
+    @include button-variant(var(--color-warning), var(--text-primary));
+  }
+
+  &.btn-danger {
+    @include button-variant(var(--color-danger));
+  }
+
+  &.btn-info {
+    @include button-variant(var(--color-info));
+  }
+
+  // Variantes de estilo
+  &.btn-outline {
+    background-color: transparent;
+    
+    &.btn-primary {
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+      
+      &:hover:not(:disabled) {
+        background-color: var(--color-primary);
+        color: var(--text-inverse);
+      }
+    }
+
+    &.btn-secondary {
+      color: var(--color-gray-600);
+      border-color: var(--color-gray-600);
+      
+      &:hover:not(:disabled) {
+        background-color: var(--color-gray-600);
+        color: var(--text-inverse);
+      }
+    }
+
+    &.btn-success {
+      color: var(--color-success);
+      border-color: var(--color-success);
+      
+      &:hover:not(:disabled) {
+        background-color: var(--color-success);
+        color: var(--text-inverse);
+      }
+    }
+
+    &.btn-danger {
+      color: var(--color-danger);
+      border-color: var(--color-danger);
+      
+      &:hover:not(:disabled) {
+        background-color: var(--color-danger);
+        color: var(--text-inverse);
+      }
+    }
+  }
+
+  &.btn-ghost {
+    background-color: transparent;
+    border-color: transparent;
+    
+    &.btn-primary {
+      color: var(--color-primary);
+      
+      &:hover:not(:disabled) {
+        background-color: var(--color-primary-light);
+      }
+    }
+
+    &.btn-secondary {
+      color: var(--color-gray-600);
+      
+      &:hover:not(:disabled) {
+        background-color: var(--color-gray-100);
+      }
+    }
+
+    &.btn-danger {
+      color: var(--color-danger);
+      
+      &:hover:not(:disabled) {
+        background-color: var(--color-danger-light);
+      }
+    }
+  }
+
+  &.btn-link {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--color-primary);
+    padding: 0;
+    text-decoration: underline;
+    
+    &:hover:not(:disabled) {
+      background-color: transparent;
+      color: var(--color-primary-dark);
+    }
+  }
+
+  // Tamaños
+  &.btn-sm {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    border-radius: var(--border-radius-sm);
+  }
+
+  &.btn-lg {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-lg);
+    border-radius: var(--border-radius-lg);
+  }
+
+  &.btn-xl {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-size: var(--font-size-xl);
+    border-radius: var(--border-radius-lg);
+  }
+
+  // Estados especiales
+  &.btn-loading {
+    position: relative;
+    color: transparent !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      color: var(--text-inverse);
+    }
+
+    &.btn-outline::after,
+    &.btn-ghost::after {
+      color: currentColor;
+    }
+  }
+
+  &.btn-block {
+    width: 100%;
+    display: flex;
+  }
+
+  &.btn-icon-only {
+    width: auto;
+    aspect-ratio: 1;
+    padding: var(--spacing-sm);
+
+    &.btn-sm {
+      padding: var(--spacing-xs);
+    }
+
+    &.btn-lg {
+      padding: var(--spacing-md);
+    }
+  }
+
+  // Con iconos
+  &.btn-with-icon {
+    gap: var(--spacing-sm);
+
+    .btn-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+
+      &.icon-left {
+        order: -1;
+      }
+
+      &.icon-right {
+        order: 1;
+      }
+    }
+
+    &.btn-sm .btn-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    &.btn-lg .btn-icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  // Estados de animación
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  // Floating action button
+  &.btn-fab {
+    position: fixed;
+    bottom: var(--spacing-xl);
+    right: var(--spacing-xl);
+    z-index: var(--z-fixed);
+    border-radius: var(--border-radius-full);
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    box-shadow: var(--shadow-lg);
+    
+    &:hover {
+      box-shadow: var(--shadow-xl);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Grupo de botones
+.btn-group {
+  display: inline-flex;
+  vertical-align: middle;
+
+  .btn {
+    position: relative;
+    border-radius: 0;
+
+    &:first-child {
+      border-top-left-radius: var(--border-radius-base);
+      border-bottom-left-radius: var(--border-radius-base);
+    }
+
+    &:last-child {
+      border-top-right-radius: var(--border-radius-base);
+      border-bottom-right-radius: var(--border-radius-base);
+    }
+
+    &:not(:first-child) {
+      margin-left: -1px;
+    }
+
+    &:hover,
+    &:focus,
+    &.active {
+      z-index: 1;
+    }
+  }
+
+  &.btn-group-vertical {
+    flex-direction: column;
+    align-items: stretch;
+
+    .btn {
+      &:first-child {
+        border-radius: var(--border-radius-base) var(--border-radius-base) 0 0;
+      }
+
+      &:last-child {
+        border-radius: 0 0 var(--border-radius-base) var(--border-radius-base);
+      }
+
+      &:not(:first-child) {
+        margin-left: 0;
+        margin-top: -1px;
+      }
+    }
+  }
+
+  &.btn-group-sm .btn {
+    @extend .btn-sm !optional;
+  }
+
+  &.btn-group-lg .btn {
+    @extend .btn-lg !optional;
+  }
+}
+
+// Toggle buttons
+.btn-toggle {
+  &.active {
+    background-color: var(--color-primary);
+    color: var(--text-inverse);
+    border-color: var(--color-primary);
+
+    &:hover {
+      background-color: var(--color-primary-dark);
+      border-color: var(--color-primary-dark);
+    }
+  }
+}
+
+// Dropdown button
+.btn-dropdown {
+  position: relative;
+
+  &::after {
+    content: '';
+    border: 0.3em solid transparent;
+    border-top-color: currentColor;
+    margin-left: var(--spacing-xs);
+    vertical-align: 0.15em;
+  }
+
+  &.dropup::after {
+    border-top-color: transparent;
+    border-bottom-color: currentColor;
+  }
+
+  &.dropdown-toggle-split {
+    padding-left: var(--spacing-sm);
+    padding-right: var(--spacing-sm);
+
+    &::after {
+      margin-left: 0;
+    }
+  }
+}
+
+// Close button
+.btn-close {
+  @include button-base;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='m.235.757 14.142 14.142-1.414 1.414L.821 2.171z'/%3e%3cpath d='m14.142.757L0 14.899l1.414 1.414L15.556 2.171z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+  border: 0;
+  border-radius: var(--border-radius-base);
+  opacity: 0.5;
+  transition: var(--transition-base);
+
+  &:hover {
+    opacity: 0.75;
+  }
+
+  &:focus {
+    opacity: 1;
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  &.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+  }
+}
+
+// Responsive behavior
+@include respond-to(sm) {
+  .btn-responsive {
+    &.btn-sm {
+      // Use mixin content instead of @extend
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      border-radius: 0.25rem;
+    }
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+  }
+}

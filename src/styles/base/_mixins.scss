@@ -1,0 +1,215 @@
+// Mixins y funciones utilitarias para arquitectura escalable
+// Siguiendo patrones de diseño reutilizables
+
+// Mixin para breakpoints responsivos
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (min-width: 0) {
+      @content;
+    }
+  }
+  @if $breakpoint == sm {
+    @media (min-width: 576px) {
+      @content;
+    }
+  }
+  @if $breakpoint == md {
+    @media (min-width: 768px) {
+      @content;
+    }
+  }
+  @if $breakpoint == lg {
+    @media (min-width: 992px) {
+      @content;
+    }
+  }
+  @if $breakpoint == xl {
+    @media (min-width: 1200px) {
+      @content;
+    }
+  }
+  @if $breakpoint == 2xl {
+    @media (min-width: 1400px) {
+      @content;
+    }
+  }
+}
+
+// Mixin para centrar elementos con flexbox
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Mixin para botones base (siguiendo principio DRY)
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-base);
+  border: var(--border-width-thin) solid transparent;
+  border-radius: var(--border-radius-base);
+  cursor: pointer;
+  transition: var(--transition-base);
+  text-decoration: none;
+  user-select: none;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+// Mixin para variantes de botones
+@mixin button-variant($bg-color, $text-color: var(--text-inverse), $border-color: $bg-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  border-color: $border-color;
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, $bg-color 85%, black);
+    border-color: color-mix(in srgb, $border-color 85%, black);
+  }
+
+  &:active:not(:disabled) {
+    background-color: color-mix(in srgb, $bg-color 75%, black);
+    border-color: color-mix(in srgb, $border-color 75%, black);
+  }
+}
+
+// Mixin para inputs base
+@mixin input-base {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--border-radius-base);
+  transition: var(--transition-base);
+
+  &:focus {
+    outline: none;
+    border-color: var(--border-color-focus);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+
+  &:disabled {
+    background-color: var(--color-gray-100);
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
+}
+
+// Mixin para cards/tarjetas
+@mixin card-base {
+  background-color: var(--bg-primary);
+  border: var(--border-width-thin) solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+}
+
+// Mixin para estados de validación
+@mixin validation-state($color) {
+  border-color: $color;
+  
+  &:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, $color 20%, transparent);
+  }
+
+  & + .feedback {
+    color: $color;
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-xs);
+  }
+}
+
+// Mixin para truncar texto
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Mixin para texto multilínea truncado
+@mixin text-truncate-multiline($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Mixin para clearfix (por compatibilidad legacy)
+@mixin clearfix {
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+// Mixin para ocultar texto visualmente pero mantenerlo accesible
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+// Mixin para resetear listas
+@mixin list-reset {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Mixin para posicionamiento absoluto centrado
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// Función para calcular espaciado fluido
+@function fluid-size($min, $max, $min-vw: 320px, $max-vw: 1200px) {
+  @return calc(#{$min} + #{($max - $min)} * (100vw - #{$min-vw}) / #{($max-vw - $min-vw)});
+}
+
+// Función para validar colores
+@function validate-color($color) {
+  @if type-of($color) != 'color' {
+    @error 'Expected a color, got #{type-of($color)}';
+  }
+  @return $color;
+}
+
+// Alias para utilities
+@mixin breakpoint($breakpoint) {
+  @include respond-to($breakpoint) {
+    @content;
+  }
+}

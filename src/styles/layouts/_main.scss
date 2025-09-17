@@ -1,0 +1,391 @@
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+// Main content area styles para layout principal
+// Área de contenido principal con máxima flexibilidad
+
+.main {
+  background-color: var(--bg-secondary);
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  position: relative;
+
+  @include respond-to(lg) {
+    padding: var(--spacing-xl);
+  }
+
+  &__container {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  &__header {
+    margin-bottom: var(--spacing-xl);
+
+    &-title {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0 0 var(--spacing-sm) 0;
+      line-height: var(--line-height-tight);
+
+      @include respond-to(md) {
+        font-size: var(--font-size-4xl);
+      }
+    }
+
+    &-subtitle {
+      font-size: var(--font-size-lg);
+      color: var(--text-secondary);
+      margin: 0 0 var(--spacing-md) 0;
+    }
+
+    &-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-sm);
+      align-items: center;
+
+      @include respond-to(md) {
+        gap: var(--spacing-md);
+      }
+    }
+
+    &-breadcrumbs {
+      margin-bottom: var(--spacing-md);
+    }
+
+    // Header con layout flex para título y acciones
+    &.flex {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-md);
+
+      @include respond-to(md) {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+
+      #{&}-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      #{&}-actions {
+        flex-shrink: 0;
+        margin: 0;
+      }
+    }
+  }
+
+  &__content {
+    background-color: var(--bg-primary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    border: var(--border-width-thin) solid var(--border-color);
+
+    @include respond-to(lg) {
+      padding: var(--spacing-xl);
+    }
+
+    // Sin padding para contenido que maneja su propio espaciado
+    &.no-padding {
+      padding: 0;
+    }
+
+    // Contenido con padding reducido
+    &.compact {
+      padding: var(--spacing-md);
+
+      @include respond-to(lg) {
+        padding: var(--spacing-lg);
+      }
+    }
+  }
+
+  &__section {
+    margin-bottom: var(--spacing-xl);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &-header {
+      margin-bottom: var(--spacing-lg);
+
+      &-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-semibold);
+        color: var(--text-primary);
+        margin: 0 0 var(--spacing-sm) 0;
+      }
+
+      &-description {
+        color: var(--text-secondary);
+        font-size: var(--font-size-base);
+        margin: 0;
+      }
+    }
+  }
+
+  &__loading {
+    @include flex-center;
+    min-height: 200px;
+    color: var(--text-muted);
+
+    &-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--color-gray-200);
+      border-top: 3px solid var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: var(--spacing-md);
+    }
+
+    &-text {
+      font-size: var(--font-size-base);
+      color: var(--text-muted);
+    }
+  }
+
+  &__empty {
+    @include flex-center;
+    flex-direction: column;
+    min-height: 200px;
+    color: var(--text-muted);
+    text-align: center;
+
+    &-icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: var(--spacing-md);
+      opacity: 0.5;
+    }
+
+    &-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--text-secondary);
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+
+    &-description {
+      font-size: var(--font-size-base);
+      color: var(--text-muted);
+      margin: 0 0 var(--spacing-lg) 0;
+      max-width: 400px;
+    }
+
+    &-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+
+  &__error {
+    background-color: var(--color-danger-light);
+    border: var(--border-width-thin) solid var(--color-danger);
+    border-radius: var(--border-radius-base);
+    padding: var(--spacing-lg);
+    text-align: center;
+
+    &-icon {
+      width: 48px;
+      height: 48px;
+      color: var(--color-danger);
+      margin: 0 auto var(--spacing-md);
+    }
+
+    &-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-danger);
+      margin: 0 0 var(--spacing-sm) 0;
+    }
+
+    &-message {
+      color: var(--text-primary);
+      margin: 0 0 var(--spacing-md) 0;
+    }
+
+    &-actions {
+      display: flex;
+      gap: var(--spacing-sm);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  }
+
+  // Variantes del main
+  &.fullscreen {
+    padding: 0;
+
+    #{&}__content {
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+  }
+
+  &.compact {
+    padding: var(--spacing-md);
+
+    @include respond-to(lg) {
+      padding: var(--spacing-lg);
+    }
+
+    #{&}__header {
+      margin-bottom: var(--spacing-lg);
+
+      &-title {
+        font-size: var(--font-size-2xl);
+      }
+    }
+  }
+
+  &.centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 120px);
+
+    #{&}__content {
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  }
+
+  &.split {
+    display: grid;
+    gap: var(--spacing-lg);
+    grid-template-columns: 1fr;
+
+    @include respond-to(lg) {
+      grid-template-columns: 1fr 350px;
+      gap: var(--spacing-xl);
+    }
+
+    &-primary {
+      min-width: 0;
+    }
+
+    &-secondary {
+      @include respond-to(lg) {
+        position: sticky;
+        top: var(--spacing-lg);
+        height: fit-content;
+      }
+    }
+  }
+}
+
+// Breadcrumbs component
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+
+  &__item {
+    display: flex;
+    align-items: center;
+
+    &:not(:last-child)::after {
+      content: '/';
+      margin-left: var(--spacing-xs);
+      color: var(--text-muted);
+    }
+
+    a {
+      color: var(--text-muted);
+      text-decoration: none;
+      
+      &:hover {
+        color: var(--color-primary);
+      }
+    }
+
+    &.active {
+      color: var(--text-primary);
+      font-weight: var(--font-weight-medium);
+    }
+  }
+
+  &__separator {
+    color: var(--text-muted);
+    margin: 0 var(--spacing-xs);
+  }
+}
+
+// Stats/metrics cards para dashboard
+.stats {
+  display: grid;
+  gap: var(--spacing-md);
+  grid-template-columns: 1fr;
+  margin-bottom: var(--spacing-xl);
+
+  @include respond-to(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-to(lg) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  &__card {
+    @include card-base;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+
+    &-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto var(--spacing-md);
+      background-color: var(--color-primary-light);
+      border-radius: var(--border-radius-full);
+      @include flex-center;
+      color: var(--color-primary);
+    }
+
+    &-value {
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--text-primary);
+      margin: 0 0 var(--spacing-xs) 0;
+    }
+
+    &-label {
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      font-weight: var(--font-weight-medium);
+    }
+
+    &-change {
+      position: absolute;
+      top: var(--spacing-sm);
+      right: var(--spacing-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      padding: 0.25em 0.5em;
+      border-radius: var(--border-radius-full);
+
+      &.positive {
+        background-color: var(--color-success-light);
+        color: var(--color-success);
+      }
+
+      &.negative {
+        background-color: var(--color-danger-light);
+        color: var(--color-danger);
+      }
+    }
+  }
+}

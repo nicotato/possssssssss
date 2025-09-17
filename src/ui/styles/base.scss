@@ -1,28 +1,29 @@
-@use 'variables' as *;
-@use 'mixins' as *;
-@use 'sass:color';
+// Legacy base styles - now uses @use for imports
+@use '../../styles/base/variables' as *;
+@use '../../styles/base/mixins' as *;
 
-html,body { margin:0; padding:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:$color-bg; color:$color-text; }
+html,body { margin:0; padding:0; font-family: var(--font-family-base); background: var(--bg-primary); color: var(--text-primary); }
 
 h1,h2,h3 { margin:0 0 .75rem; font-weight:600; }
 
-button, .btn { @include button-reset; background:$color-primary; color:#fff; padding:.55rem .9rem; border-radius:$radius-sm; font-size:.8rem; line-height:1; display:inline-flex; gap:.35rem; align-items:center; transition:background $transition-fast; }
-button:hover, .btn:hover { background:color.adjust($color-primary, $lightness: -7%); }
+button, .btn { @include button-base; background: var(--color-primary); color:#fff; padding:.55rem .9rem; border-radius: var(--border-radius-sm); font-size:.8rem; line-height:1; display:inline-flex; gap:.35rem; align-items:center; transition:background var(--transition-fast); }
+// Hover usa color-mix (CSS nativo) para oscurecer sin depender de sass:color
+button:hover, .btn:hover { background: color-mix(in srgb, var(--color-primary) 90%, black); }
 button:disabled { opacity:.55; cursor:not-allowed; }
 
-.btn-outline { background:#fff; border:1px solid $color-primary; color:$color-primary; }
-.btn-outline:hover { background:$color-primary; color:#fff; }
+.btn-outline { background:#fff; border:1px solid var(--color-primary); color: var(--color-primary); }
+.btn-outline:hover { background: var(--color-primary); color:#fff; }
 
 .table { width:100%; border-collapse:collapse; font-size:.75rem; }
-.table th { text-align:left; background:$color-primary; color:#fff; padding:.4rem .5rem; }
+.table th { text-align:left; background: var(--color-primary); color:#fff; padding:.4rem .5rem; }
 .table td { padding:.35rem .5rem; border-bottom:1px solid #e2ddd7; }
 
-.navbar { background:linear-gradient(90deg,#d9480f,$color-primary); color:#fff; box-shadow:$shadow-sm; padding:.4rem 1rem; }
+.navbar { background:linear-gradient(90deg,#d9480f, var(--color-primary)); color:#fff; box-shadow: var(--shadow-sm); padding:.4rem 1rem; }
 .navbar ul { list-style:none; padding:0; margin:0; display:flex; gap:.75rem; }
-.navbar a { color:#fff; text-decoration:none; font-size:.8rem; padding:.35rem .6rem; border-radius:$radius-sm; transition:background $transition-fast; }
+.navbar a { color:#fff; text-decoration:none; font-size:.8rem; padding:.35rem .6rem; border-radius: var(--border-radius-sm); transition:background var(--transition-fast); }
 .navbar a.active, .navbar a:hover { background:rgba(255,255,255,.15); }
 
-.badge { background:$color-primary; color:#fff; border-radius:999px; padding:.25rem .6rem; font-size:.6rem; font-weight:600; letter-spacing:.5px; }
+.badge { background: var(--color-primary); color:#fff; border-radius:999px; padding:.25rem .6rem; font-size:.6rem; font-weight:600; letter-spacing:.5px; }
 
 .layout { display:flex; flex-direction:column; min-height:100vh; }
 .layout main { flex:1; padding:1rem; }

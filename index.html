@@ -14,8 +14,92 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#f77f00"/>
   
-  <!-- Stylesheets with cache busting -->
-  <link rel="stylesheet" href="style.css" />
+  <!-- Modular SCSS now imported via TypeScript/Vite -->
+  
+  <!-- Inline CSS para loading inmediato (antes de que carguen los bundles) -->
+  <style>
+    .initial-loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(135deg, #f77f00 0%, #d62828 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .loader-content {
+      text-align: center;
+      color: white;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-left: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    .loader-content h2 {
+      margin: 0 0 10px;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .loader-content p {
+      margin: 0 0 20px;
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+
+    .progress-bar {
+      width: 200px;
+      height: 4px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 2px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: white;
+      border-radius: 2px;
+      width: 0%;
+      animation: progress 3s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes progress {
+      0% { width: 0%; }
+      70% { width: 100%; }
+      100% { width: 100%; }
+    }
+
+    /* Ocultar el loading cuando la app esté lista */
+    .app-loaded .initial-loader {
+      opacity: 0;
+      transition: opacity 0.5s ease-out;
+      pointer-events: none;
+    }
+  </style>
   
   <!-- Development mode detection -->
   <script>
@@ -26,6 +110,18 @@
   </script>
 </head>
 <body>
+  <!-- Loading inicial inmediato -->
+  <div id="initial-loader" class="initial-loader">
+    <div class="loader-content">
+      <div class="spinner"></div>
+      <h2>POS - Pizzería del Barrio</h2>
+      <p>Iniciando aplicación...</p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
   <header id="legacy-header-removed" style="display:none"></header>
   <main class="container">
     <!-- React root (migrated UI). Legacy #view-container eliminado -->

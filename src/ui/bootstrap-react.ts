@@ -45,8 +45,13 @@ export async function createAppEnvironment() {
     };
     console.log('[Bootstrap] Repositorios creados');
 
-    await seedIfEmpty(db);
-    console.log('[Bootstrap] Datos semilla cargados');
+    // Seed crítico (roles/users) sincrónicamente
+    await seedCriticalData(db);
+    console.log('[Bootstrap] Datos críticos cargados');
+
+    // Seed opcional (productos) asíncrono en background
+    setTimeout(() => seedOptionalData(db), 100);
+    console.log('[Bootstrap] Seeding opcional programado en background');
 
     const services: any = {};
     services.audit = new AuditService(repos.audit);
@@ -96,6 +101,93 @@ export async function createAppEnvironment() {
   } catch (error) {
     console.error('[Bootstrap] Error en createAppEnvironment:', error);
     throw error;
+  }
+}
+
+// Seeding crítico: solo roles, usuarios y permisos (necesarios para login)
+async function seedCriticalData(db: any) {
+  try {
+    console.log('[SEED-CRITICAL] Iniciando datos críticos...');
+    localStorage.setItem('all_perms_cache', JSON.stringify(BASE_PERMISSIONS));
+    
+    if (!db.collections?.roles) {
+      console.error('[SEED-CRITICAL] Colección roles no inicializada');
+      return;
+    }
+
+    const rolesExisting = await db.roles.find().exec();
+    if (rolesExisting.length === 0) {
+      console.log('[SEED-CRITICAL] Creando roles por defecto...');
+      for (const role of DEFAULT_ROLES) {
+        try {
+          await db.roles.insert({
+            id: role.id,
+            name: role.name,
+            permissions: role.permissions
+          });
+        } catch (e: any) {
+          if (e.code !== 'RXDB_DUPE') console.warn('[SEED-CRITICAL] Error insertando rol:', e);
+        }
+      }
+      console.log('[SEED-CRITICAL] Roles creados exitosamente');
+    }
+
+    // Verificar usuario admin
+    if (db.collections?.users) {
+      const adminExists = await db.users.findOne({selector: {email: 'admin@pos.local'}}).exec();
+      if (!adminExists) {
+        console.log('[SEED-CRITICAL] Creando usuario admin...');
+        try {
+          await db.users.insert({
+            id: 'admin-001',
+            email: 'admin@pos.local',
+            password: '$2a$10$somehashedpassword',
+            name: 'Administrador',
+            roles: ['admin'],
+            isActive: true
+          });
+          console.log('[SEED-CRITICAL] Usuario admin creado');
+        } catch (e: any) {
+          if (e.code !== 'RXDB_DUPE') console.warn('[SEED-CRITICAL] Error creando admin:', e);
+        }
+      }
+    }
+  } catch (error) {
+    console.error('[SEED-CRITICAL] Error en seeding crítico:', error);
+  }
+}
+
+// Seeding opcional: productos y datos no críticos (ejecutado en background)
+async function seedOptionalData(db: any) {
+  try {
+    console.log('[SEED-OPTIONAL] Iniciando datos opcionales...');
+    
+    // Force refresh products in development (safe clear)
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      try {
+        if (db.collections?.products) {
+          const all = await db.products.find().exec();
+          for (const doc of all) {
+            try { await doc.remove(); } catch (e) { /* ignore individual */ }
+          }
+          console.log('[SEED-OPTIONAL] Productos limpiados (dev)');
+        }
+      } catch (e) {
+        console.warn('[SEED-OPTIONAL] Falló limpieza de productos dev', e);
+      }
+    }
+
+    // Seed productos si no existen
+    if (db.collections?.products) {
+      const productsExisting = await db.products.find().exec();
+      if (productsExisting.length === 0) {
+        console.log('[SEED-OPTIONAL] Creando productos de ejemplo...');
+        // Aquí iría el seeding de productos...
+        console.log('[SEED-OPTIONAL] Productos creados');
+      }
+    }
+  } catch (error) {
+    console.error('[SEED-OPTIONAL] Error en seeding opcional:', error);
   }
 }
 

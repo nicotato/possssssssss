@@ -1,0 +1,567 @@
+// Utility classes siguiendo design system
+// Classes de utilidad para espaciado, tipografia, colores, etc.
+@use 'sass:map';
+@use '../base/variables' as *;
+@use '../base/mixins' as *;
+
+// === SPACING UTILITIES ===
+// Margin utilities
+@each $breakpoint, $value in $breakpoints {
+  @include breakpoint($breakpoint) {
+    @for $i from 0 through 6 {
+      $size: if($i == 0, 0, var(--spacing-#{map.get($spacing-scale, $i)}));
+      
+      .m#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { margin: #{$size} !important; }
+      .mt#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { margin-top: #{$size} !important; }
+      .mr#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { margin-right: #{$size} !important; }
+      .mb#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { margin-bottom: #{$size} !important; }
+      .ml#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { margin-left: #{$size} !important; }
+      .mx#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { margin-left: #{$size} !important; margin-right: #{$size} !important; }
+      .my#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { margin-top: #{$size} !important; margin-bottom: #{$size} !important; }
+    }
+    
+    // Auto margins
+    .m#{if($breakpoint != xs, -#{$breakpoint}, '')}-auto { margin: auto !important; }
+    .mt#{if($breakpoint != xs, -#{$breakpoint}, '')}-auto { margin-top: auto !important; }
+    .mr#{if($breakpoint != xs, -#{$breakpoint}, '')}-auto { margin-right: auto !important; }
+    .mb#{if($breakpoint != xs, -#{$breakpoint}, '')}-auto { margin-bottom: auto !important; }
+    .ml#{if($breakpoint != xs, -#{$breakpoint}, '')}-auto { margin-left: auto !important; }
+    .mx#{if($breakpoint != xs, -#{$breakpoint}, '')}-auto { margin-left: auto !important; margin-right: auto !important; }
+    .my#{if($breakpoint != xs, -#{$breakpoint}, '')}-auto { margin-top: auto !important; margin-bottom: auto !important; }
+  }
+}
+
+// Padding utilities
+@each $breakpoint, $value in $breakpoints {
+  @include breakpoint($breakpoint) {
+    @for $i from 0 through 6 {
+      $size: if($i == 0, 0, var(--spacing-#{map.get($spacing-scale, $i)}));
+      
+      .p#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { padding: #{$size} !important; }
+      .pt#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { padding-top: #{$size} !important; }
+      .pr#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { padding-right: #{$size} !important; }
+      .pb#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { padding-bottom: #{$size} !important; }
+      .pl#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { padding-left: #{$size} !important; }
+      .px#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { padding-left: #{$size} !important; padding-right: #{$size} !important; }
+      .py#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { padding-top: #{$size} !important; padding-bottom: #{$size} !important; }
+    }
+  }
+}
+
+// === DISPLAY UTILITIES ===
+$displays: (none, inline, inline-block, block, table, table-row, table-cell, flex, inline-flex, grid, inline-grid);
+
+@each $breakpoint, $value in $breakpoints {
+  @include breakpoint($breakpoint) {
+    @each $display in $displays {
+      .d#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$display} { 
+        display: #{$display} !important; 
+      }
+    }
+  }
+}
+
+// === FLEXBOX UTILITIES ===
+@each $breakpoint, $value in $breakpoints {
+  @include breakpoint($breakpoint) {
+    // Flex direction
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-row { flex-direction: row !important; }
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-row-reverse { flex-direction: row-reverse !important; }
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-column { flex-direction: column !important; }
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-column-reverse { flex-direction: column-reverse !important; }
+    
+    // Flex wrap
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-wrap { flex-wrap: wrap !important; }
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-nowrap { flex-wrap: nowrap !important; }
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-wrap-reverse { flex-wrap: wrap-reverse !important; }
+    
+    // Justify content
+    .justify#{if($breakpoint != xs, -#{$breakpoint}, '')}-start { justify-content: flex-start !important; }
+    .justify#{if($breakpoint != xs, -#{$breakpoint}, '')}-end { justify-content: flex-end !important; }
+    .justify#{if($breakpoint != xs, -#{$breakpoint}, '')}-center { justify-content: center !important; }
+    .justify#{if($breakpoint != xs, -#{$breakpoint}, '')}-between { justify-content: space-between !important; }
+    .justify#{if($breakpoint != xs, -#{$breakpoint}, '')}-around { justify-content: space-around !important; }
+    .justify#{if($breakpoint != xs, -#{$breakpoint}, '')}-evenly { justify-content: space-evenly !important; }
+    
+    // Align items
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-start { align-items: flex-start !important; }
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-end { align-items: flex-end !important; }
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-center { align-items: center !important; }
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-baseline { align-items: baseline !important; }
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-stretch { align-items: stretch !important; }
+    
+    // Align self
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-self-start { align-self: flex-start !important; }
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-self-end { align-self: flex-end !important; }
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-self-center { align-self: center !important; }
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-self-baseline { align-self: baseline !important; }
+    .align#{if($breakpoint != xs, -#{$breakpoint}, '')}-self-stretch { align-self: stretch !important; }
+    
+    // Flex grow and shrink
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-fill { flex: 1 1 auto !important; }
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-grow-0 { flex-grow: 0 !important; }
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-grow-1 { flex-grow: 1 !important; }
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-shrink-0 { flex-shrink: 0 !important; }
+    .flex#{if($breakpoint != xs, -#{$breakpoint}, '')}-shrink-1 { flex-shrink: 1 !important; }
+  }
+}
+
+// === GRID UTILITIES ===
+@each $breakpoint, $value in $breakpoints {
+  @include breakpoint($breakpoint) {
+    // Grid template columns
+    @for $i from 1 through 12 {
+      .grid#{if($breakpoint != xs, -#{$breakpoint}, '')}-cols-#{$i} { 
+        grid-template-columns: repeat(#{$i}, 1fr) !important; 
+      }
+    }
+    
+    // Grid column span
+    @for $i from 1 through 12 {
+      .col#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { 
+        grid-column: span #{$i} !important; 
+      }
+    }
+    
+    .col#{if($breakpoint != xs, -#{$breakpoint}, '')}-auto { grid-column: auto !important; }
+    .col#{if($breakpoint != xs, -#{$breakpoint}, '')}-full { grid-column: 1 / -1 !important; }
+    
+    // Grid row span
+    @for $i from 1 through 6 {
+      .row#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { 
+        grid-row: span #{$i} !important; 
+      }
+    }
+    
+    .row#{if($breakpoint != xs, -#{$breakpoint}, '')}-auto { grid-row: auto !important; }
+    .row#{if($breakpoint != xs, -#{$breakpoint}, '')}-full { grid-row: 1 / -1 !important; }
+    
+    // Grid gap
+    @for $i from 0 through 6 {
+      $size: if($i == 0, 0, var(--spacing-#{map.get($spacing-scale, $i)}));
+      
+      .gap#{if($breakpoint != xs, -#{$breakpoint}, '')}-#{$i} { gap: #{$size} !important; }
+      .gap#{if($breakpoint != xs, -#{$breakpoint}, '')}-x-#{$i} { column-gap: #{$size} !important; }
+      .gap#{if($breakpoint != xs, -#{$breakpoint}, '')}-y-#{$i} { row-gap: #{$size} !important; }
+    }
+  }
+}
+
+// === TEXT UTILITIES ===
+// Text alignment
+@each $breakpoint, $value in $breakpoints {
+  @include breakpoint($breakpoint) {
+    .text#{if($breakpoint != xs, -#{$breakpoint}, '')}-left { text-align: left !important; }
+    .text#{if($breakpoint != xs, -#{$breakpoint}, '')}-center { text-align: center !important; }
+    .text#{if($breakpoint != xs, -#{$breakpoint}, '')}-right { text-align: right !important; }
+    .text#{if($breakpoint != xs, -#{$breakpoint}, '')}-justify { text-align: justify !important; }
+  }
+}
+
+// Text transform
+.text-lowercase { text-transform: lowercase !important; }
+.text-uppercase { text-transform: uppercase !important; }
+.text-capitalize { text-transform: capitalize !important; }
+
+// Font weight
+.fw-light { font-weight: var(--font-weight-light) !important; }
+.fw-normal { font-weight: var(--font-weight-normal) !important; }
+.fw-medium { font-weight: var(--font-weight-medium) !important; }
+.fw-semibold { font-weight: var(--font-weight-semibold) !important; }
+.fw-bold { font-weight: var(--font-weight-bold) !important; }
+
+// Font size
+.fs-xs { font-size: var(--font-size-xs) !important; }
+.fs-sm { font-size: var(--font-size-sm) !important; }
+.fs-base { font-size: var(--font-size-base) !important; }
+.fs-lg { font-size: var(--font-size-lg) !important; }
+.fs-xl { font-size: var(--font-size-xl) !important; }
+.fs-2xl { font-size: var(--font-size-2xl) !important; }
+.fs-3xl { font-size: var(--font-size-3xl) !important; }
+
+// Line height
+.lh-1 { line-height: 1 !important; }
+.lh-sm { line-height: var(--line-height-sm) !important; }
+.lh-base { line-height: var(--line-height-base) !important; }
+.lh-lg { line-height: var(--line-height-lg) !important; }
+
+// Text decoration
+.text-decoration-none { text-decoration: none !important; }
+.text-decoration-underline { text-decoration: underline !important; }
+.text-decoration-line-through { text-decoration: line-through !important; }
+
+// White space
+.text-wrap { white-space: normal !important; }
+.text-nowrap { white-space: nowrap !important; }
+.text-break { word-wrap: break-word !important; word-break: break-word !important; }
+
+// Text overflow
+.text-truncate { 
+  overflow: hidden !important; 
+  text-overflow: ellipsis !important; 
+  white-space: nowrap !important; 
+}
+
+// === COLOR UTILITIES ===
+// Text colors
+.text-primary { color: var(--color-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-success { color: var(--color-success) !important; }
+.text-danger { color: var(--color-danger) !important; }
+.text-warning { color: var(--color-warning) !important; }
+.text-info { color: var(--color-info) !important; }
+.text-light { color: var(--color-gray-300) !important; }
+.text-dark { color: var(--color-gray-900) !important; }
+.text-muted { color: var(--text-muted) !important; }
+.text-white { color: #ffffff !important; }
+.text-black { color: #000000 !important; }
+
+// Background colors
+.bg-primary { background-color: var(--color-primary) !important; }
+.bg-secondary { background-color: var(--bg-secondary) !important; }
+.bg-success { background-color: var(--color-success) !important; }
+.bg-danger { background-color: var(--color-danger) !important; }
+.bg-warning { background-color: var(--color-warning) !important; }
+.bg-info { background-color: var(--color-info) !important; }
+.bg-light { background-color: var(--color-gray-100) !important; }
+.bg-dark { background-color: var(--color-gray-900) !important; }
+.bg-white { background-color: #ffffff !important; }
+.bg-transparent { background-color: transparent !important; }
+
+// === BORDER UTILITIES ===
+// Border
+.border { border: var(--border-width-thin) solid var(--border-color) !important; }
+.border-0 { border: 0 !important; }
+.border-top { border-top: var(--border-width-thin) solid var(--border-color) !important; }
+.border-right { border-right: var(--border-width-thin) solid var(--border-color) !important; }
+.border-bottom { border-bottom: var(--border-width-thin) solid var(--border-color) !important; }
+.border-left { border-left: var(--border-width-thin) solid var(--border-color) !important; }
+
+.border-top-0 { border-top: 0 !important; }
+.border-right-0 { border-right: 0 !important; }
+.border-bottom-0 { border-bottom: 0 !important; }
+.border-left-0 { border-left: 0 !important; }
+
+// Border colors
+.border-primary { border-color: var(--color-primary) !important; }
+.border-secondary { border-color: var(--border-color) !important; }
+.border-success { border-color: var(--color-success) !important; }
+.border-danger { border-color: var(--color-danger) !important; }
+.border-warning { border-color: var(--color-warning) !important; }
+.border-info { border-color: var(--color-info) !important; }
+.border-light { border-color: var(--color-gray-300) !important; }
+.border-dark { border-color: var(--color-gray-700) !important; }
+.border-white { border-color: #ffffff !important; }
+
+// Border radius
+.rounded { border-radius: var(--border-radius-base) !important; }
+.rounded-sm { border-radius: var(--border-radius-sm) !important; }
+.rounded-lg { border-radius: var(--border-radius-lg) !important; }
+.rounded-pill { border-radius: var(--border-radius-pill) !important; }
+.rounded-circle { border-radius: 50% !important; }
+.rounded-0 { border-radius: 0 !important; }
+
+.rounded-top { border-top-left-radius: var(--border-radius-base) !important; border-top-right-radius: var(--border-radius-base) !important; }
+.rounded-right { border-top-right-radius: var(--border-radius-base) !important; border-bottom-right-radius: var(--border-radius-base) !important; }
+.rounded-bottom { border-bottom-left-radius: var(--border-radius-base) !important; border-bottom-right-radius: var(--border-radius-base) !important; }
+.rounded-left { border-top-left-radius: var(--border-radius-base) !important; border-bottom-left-radius: var(--border-radius-base) !important; }
+
+// === POSITION UTILITIES ===
+.position-static { position: static !important; }
+.position-relative { position: relative !important; }
+.position-absolute { position: absolute !important; }
+.position-fixed { position: fixed !important; }
+.position-sticky { position: sticky !important; }
+
+// Top, right, bottom, left
+.top-0 { top: 0 !important; }
+.top-50 { top: 50% !important; }
+.top-100 { top: 100% !important; }
+.right-0 { right: 0 !important; }
+.right-50 { right: 50% !important; }
+.right-100 { right: 100% !important; }
+.bottom-0 { bottom: 0 !important; }
+.bottom-50 { bottom: 50% !important; }
+.bottom-100 { bottom: 100% !important; }
+.left-0 { left: 0 !important; }
+.left-50 { left: 50% !important; }
+.left-100 { left: 100% !important; }
+
+// Translate utilities
+.translate-middle { transform: translate(-50%, -50%) !important; }
+.translate-middle-x { transform: translateX(-50%) !important; }
+.translate-middle-y { transform: translateY(-50%) !important; }
+
+// === SIZING UTILITIES ===
+// Width
+.w-25 { width: 25% !important; }
+.w-50 { width: 50% !important; }
+.w-75 { width: 75% !important; }
+.w-100 { width: 100% !important; }
+.w-auto { width: auto !important; }
+
+// Max width
+.mw-100 { max-width: 100% !important; }
+
+// Viewport width
+.vw-100 { width: 100vw !important; }
+
+// Min viewport width
+.min-vw-100 { min-width: 100vw !important; }
+
+// Height
+.h-25 { height: 25% !important; }
+.h-50 { height: 50% !important; }
+.h-75 { height: 75% !important; }
+.h-100 { height: 100% !important; }
+.h-auto { height: auto !important; }
+
+// Max height
+.mh-100 { max-height: 100% !important; }
+
+// Viewport height
+.vh-100 { height: 100vh !important; }
+
+// Min viewport height
+.min-vh-100 { min-height: 100vh !important; }
+
+// === OVERFLOW UTILITIES ===
+.overflow-auto { overflow: auto !important; }
+.overflow-hidden { overflow: hidden !important; }
+.overflow-visible { overflow: visible !important; }
+.overflow-scroll { overflow: scroll !important; }
+
+.overflow-x-auto { overflow-x: auto !important; }
+.overflow-x-hidden { overflow-x: hidden !important; }
+.overflow-x-visible { overflow-x: visible !important; }
+.overflow-x-scroll { overflow-x: scroll !important; }
+
+.overflow-y-auto { overflow-y: auto !important; }
+.overflow-y-hidden { overflow-y: hidden !important; }
+.overflow-y-visible { overflow-y: visible !important; }
+.overflow-y-scroll { overflow-y: scroll !important; }
+
+// === SHADOW UTILITIES ===
+.shadow-none { box-shadow: none !important; }
+.shadow-sm { box-shadow: var(--shadow-sm) !important; }
+.shadow { box-shadow: var(--shadow-base) !important; }
+.shadow-lg { box-shadow: var(--shadow-lg) !important; }
+.shadow-xl { box-shadow: var(--shadow-xl) !important; }
+
+// === OPACITY UTILITIES ===
+.opacity-0 { opacity: 0 !important; }
+.opacity-25 { opacity: 0.25 !important; }
+.opacity-50 { opacity: 0.5 !important; }
+.opacity-75 { opacity: 0.75 !important; }
+.opacity-100 { opacity: 1 !important; }
+
+// === VISIBILITY UTILITIES ===
+.visible { visibility: visible !important; }
+.invisible { visibility: hidden !important; }
+
+// === Z-INDEX UTILITIES ===
+.z-n1 { z-index: -1 !important; }
+.z-0 { z-index: 0 !important; }
+.z-1 { z-index: 1 !important; }
+.z-2 { z-index: 2 !important; }
+.z-3 { z-index: 3 !important; }
+
+// === INTERACTION UTILITIES ===
+.user-select-all { user-select: all !important; }
+.user-select-auto { user-select: auto !important; }
+.user-select-none { user-select: none !important; }
+
+.pe-none { pointer-events: none !important; }
+.pe-auto { pointer-events: auto !important; }
+
+// === MISC UTILITIES ===
+// Screen readers
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.sr-only-focusable {
+  &:focus,
+  &:focus-within {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    clip: auto !important;
+    white-space: normal !important;
+  }
+}
+
+// Stretched link
+.stretched-link {
+  &::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    content: "";
+  }
+}
+
+// Close button
+.btn-close {
+  width: 1em;
+  height: 1em;
+  padding: 0;
+  color: inherit;
+  background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='m.235 1.786 5.821 5.821-5.821 5.821.943.943 5.821-5.821 5.821 5.821.943-.943-5.821-5.821 5.821-5.821-.943-.943-5.821 5.821-5.821-5.821-.943.943z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+  border: 0;
+  border-radius: var(--border-radius-base);
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity var(--transition-base);
+
+  &:hover,
+  &:focus {
+    opacity: 1;
+  }
+
+  &:disabled,
+  &.disabled {
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.25;
+  }
+}
+
+// Clearfix
+.clearfix::after {
+  display: block;
+  clear: both;
+  content: "";
+}
+
+// Float utilities
+.float-left { float: left !important; }
+.float-right { float: right !important; }
+.float-none { float: none !important; }
+
+// === UTILITIES ESPECIFICAS DEL POS ===
+// Status badges
+.status-online { 
+  @extend .bg-success !optional;
+  color: var(--text-inverse) !important;
+  padding: 2px 8px !important;
+  border-radius: var(--border-radius-pill) !important;
+  font-size: var(--font-size-xs) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+.status-offline { 
+  @extend .bg-danger !optional;
+  color: var(--text-inverse) !important;
+  padding: 2px 8px !important;
+  border-radius: var(--border-radius-pill) !important;
+  font-size: var(--font-size-xs) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+.status-pending { 
+  @extend .bg-warning !optional;
+  color: var(--text-primary) !important;
+  padding: 2px 8px !important;
+  border-radius: var(--border-radius-pill) !important;
+  font-size: var(--font-size-xs) !important;
+  font-weight: var(--font-weight-semibold) !important;
+}
+
+// Currency formatting
+.currency {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-semibold);
+}
+
+.currency-large {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+// Loading states
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 0.125em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Scroll utilities
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Print utilities
+@media print {
+  .d-print-none { display: none !important; }
+  .d-print-inline { display: inline !important; }
+  .d-print-inline-block { display: inline-block !important; }
+  .d-print-block { display: block !important; }
+  .d-print-table { display: table !important; }
+  .d-print-table-row { display: table-row !important; }
+  .d-print-table-cell { display: table-cell !important; }
+  .d-print-flex { display: flex !important; }
+  .d-print-inline-flex { display: inline-flex !important; }
+}
+
+// === ASPECT RATIO UTILITIES ===
+.ratio {
+  position: relative;
+  width: 100%;
+
+  &::before {
+    display: block;
+    padding-top: var(--aspect-ratio);
+    content: "";
+  }
+
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  &.ratio-1x1 { --aspect-ratio: 100%; }
+  &.ratio-4x3 { --aspect-ratio: 75%; }
+  &.ratio-16x9 { --aspect-ratio: 56.25%; }
+  &.ratio-21x9 { --aspect-ratio: 42.857%; }
+}

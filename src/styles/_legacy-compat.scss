@@ -1,0 +1,61 @@
+// Compatibilidad temporal con clases legacy mientras se migra a arquitectura modular
+// Mapear y/o reimplementar estilos críticos para no romper UI existente
+@use 'base/variables' as *;
+@use 'base/mixins' as *;
+
+.layout { 
+  display: grid;
+  grid-template-areas: 
+    "header header"
+    "sidebar main"
+    "footer footer";
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 250px 1fr;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    grid-template-areas: 
+      "header"
+      "main"
+      "footer";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+}
+
+// Formularios cliente (legacy)
+.cliente-form { @include card-base; }
+
+// Buscador
+.buscador-container { display:flex; justify-content:center; margin: var(--spacing-md) 0; }
+
+// Input buscador
+#input-buscar {
+  width:100%; max-width:480px; padding: .75rem 1rem .75rem 3rem; border:2px solid var(--color-gray-200);
+  border-radius: 25px; font-size:.95rem; background:#fff; transition: var(--transition-base);
+  box-shadow: var(--shadow-sm);
+  &:focus { outline:2px solid var(--color-primary-light); border-color: var(--color-primary); }
+}
+
+// Badges
+.badge { display:inline-block; background: var(--color-primary); color: var(--text-inverse); padding:.25rem .6rem; border-radius: var(--border-radius-full); font-size:.65rem; font-weight:600; letter-spacing:.5px; }
+
+// Legacy table quick fallback
+.table-basic { 
+  width: 100%;
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+  border-collapse: collapse;
+
+  th, td {
+    padding: var(--spacing-md);
+    vertical-align: top;
+    border-bottom: var(--border-width-thin) solid var(--border-color);
+  }
+}
+
+// Legacy navbar fallback when expecting .navbar existing flat styles
+.navbar { background: linear-gradient(90deg,#d9480f,var(--color-primary)); color: var(--text-inverse); }
+
+// Hide legacy menu container if still present
+div.menu, .menu { display:none !important; }
