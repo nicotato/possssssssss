@@ -461,6 +461,34 @@
 .total-amount { @extend .summary-amount; }
 
 // Additional direct styles for legacy cart classes
+.cart-tax-section {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-top: var(--border-width-thin) solid var(--border-color);
+  border-bottom: var(--border-width-thin) solid var(--border-color);
+  margin: var(--spacing-sm) 0;
+}
+
+.cart-tax-header {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.cart-tax-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
 .cart-empty-icon {
   font-size: 3rem;
   margin-bottom: var(--spacing-lg);
@@ -491,8 +519,8 @@
 
 .tax-detail {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .tax-scope {
@@ -500,6 +528,9 @@
   padding: 0.1rem var(--spacing-xs);
   border-radius: var(--border-radius-sm);
   opacity: 0.8;
+  font-weight: var(--font-weight-medium);
+  display: inline-block;
+  margin-top: 0.15rem;
 }
 
 .tax-scope--line {

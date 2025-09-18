@@ -5,7 +5,7 @@ import { SideDrawer } from './components/SideDrawer.tsx';
 import { SyncStatus } from './components/SyncStatus.tsx';
 import { ToastProvider } from './components/ToastProvider.tsx';
 import { ConfirmProvider } from './components/ConfirmProvider.tsx';
-import { FormModalProvider } from './hooks/useFormModal.js';
+import { FormModalProvider } from './hooks/useFormModal.tsx';
 import { DiagnosticInfo } from './components/DiagnosticInfo.tsx';
 import { ProductsPage } from './pages/ProductsPage.tsx';
 import { LoginPage } from './pages/LoginPage.tsx';
@@ -25,6 +25,7 @@ import WastePage from './pages/WastePage.tsx';
 import PromotionsPage from './pages/PromotionsPage.tsx';
 import PromoSimPage from './pages/PromoSimPage.tsx';
 import PriceExperimentsPage from './pages/PriceExperimentsPage.tsx';
+import KdsPage from './pages/KdsPage.tsx';
 import { useAppState } from './AppContext.tsx';
 
 const Protected: React.FC<{children: React.ReactNode}> = ({ children }) => {
@@ -81,6 +82,7 @@ export const App: React.FC = () => {
                 <Route path="/menu" element={<Protected><MenuPage /></Protected>} />
                 <Route path="/ventas" element={<Protected><VentasPage /></Protected>} />
                 <Route path="/ordenes" element={<Protected><OrdersAdminPage /></Protected>} />
+                <Route path="/kds" element={<Protected><KdsPage /></Protected>} />
                 <Route path="/promociones" element={<Protected><PromotionsPage /></Protected>} />
                 <Route path="/promo-sim" element={<Protected><PromoSimPage /></Protected>} />
                 <Route path="/price-experiments" element={<Protected><PriceExperimentsPage /></Protected>} />

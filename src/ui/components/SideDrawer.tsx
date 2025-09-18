@@ -6,6 +6,7 @@ const NAV_ITEMS: { path: string; label: string; icon: string; perm?: string }[] 
   { path: '/menu', label: 'Menú', icon: '🍕', perm: 'PRODUCT_VIEW' },
   { path: '/ventas', label: 'Ventas', icon: '💰', perm: 'SALE_VIEW' },
   { path: '/ordenes', label: 'Órdenes', icon: '📋', perm: 'SALE_VIEW' },
+  { path: '/kds', label: 'Kitchen Display', icon: '🍳', perm: 'KITCHEN_VIEW' },
   { path: '/productos', label: 'Productos', icon: '🛍️', perm: 'PRODUCT_VIEW' },
   { path: '/promociones', label: 'Promociones', icon: '🎁', perm: 'PRODUCT_VIEW' },
   { path: '/promo-sim', label: 'Simulación Promociones', icon: '🎯', perm: 'PRODUCT_VIEW' },

@@ -4,7 +4,7 @@ import { useRepos, useServices } from '../hooks/useServices.ts';
 import { Modal } from '../components/Modal.tsx';
 import { useToasts } from '../components/ToastProvider.tsx';
 import { useConfirm } from '../components/ConfirmProvider.tsx';
-import { useFormModal } from '../hooks/useFormModal.js';
+import { useFormModal } from '../hooks/useFormModal.tsx';
 import { Input, Button, Card, CardHeader, CardBody, Badge } from '../components/index.js';
 import { ProfessionalCart } from '../components/ProfessionalCart.tsx';
 

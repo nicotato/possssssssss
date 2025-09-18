@@ -26,13 +26,14 @@ export const DEFAULT_ROLES = [
     description: 'Supervisa y controla',
     permissions: [
       'PRODUCT_VIEW','SALE_VIEW','SALE_CANCEL','INVOICE_PRINT',
-      'KITCHEN_PRINT','REPORT_VIEW','SALE_FULFILL','CUSTOMER_VIEW'
+      'KITCHEN_PRINT','REPORT_VIEW','SALE_FULFILL','CUSTOMER_VIEW',
+      'KITCHEN_VIEW','KITCHEN_MANAGE'
     ]
   },
   {
     id: 'r_visor',
     name: 'VISOR',
     description: 'Solo consulta',
-    permissions: ['PRODUCT_VIEW','SALE_VIEW','REPORT_VIEW','CUSTOMER_VIEW']
+    permissions: ['PRODUCT_VIEW','SALE_VIEW','REPORT_VIEW','CUSTOMER_VIEW','KITCHEN_VIEW']
   }
 ];

@@ -3,7 +3,7 @@ import { useServices } from '../hooks/useServices.ts';
 import { Tag } from '../components/Tag.tsx';
 import { Modal } from '../components/Modal.tsx';
 import { useToasts } from '../components/ToastProvider.tsx';
-import { useFormModal } from '../hooks/useFormModal.js';
+import { useFormModal } from '../hooks/useFormModal.tsx';
 
 interface Role { id:string; name:string; description?:string; permissions:string[]; }
 

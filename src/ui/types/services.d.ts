@@ -23,6 +23,7 @@ export interface OrderDTO {
   customerName?:string;
   customerPhone?:string; 
   total:number; 
+  kitchenStatus?: 'pending' | 'in_progress' | 'done';
 }
 export interface AuthService {
   isAuthenticated(): boolean;

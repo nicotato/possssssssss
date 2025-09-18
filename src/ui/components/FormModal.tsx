@@ -16,6 +16,9 @@ export function FormModal<T extends Record<string, any>=any>({ title, fields, in
   const [error,setError] = useState<string|null>(null);
   const [busy,setBusy] = useState(false);
 
+  // Debug log
+  console.log('FormModal rendering:', { title, fields, initial });
+
   function update(name:string, value:any){ setValues((v:any)=> ({...v,[name]: value})); }
 
   async function handleSubmit(e:React.FormEvent){
@@ -33,8 +36,28 @@ export function FormModal<T extends Record<string, any>=any>({ title, fields, in
   }
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal">
+    <div className="modal-backdrop" style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.6)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 10000
+    }}>
+      <div className="modal" style={{
+        background: 'white',
+        borderRadius: '8px',
+        width: '90%',
+        maxWidth: '500px',
+        maxHeight: '80vh',
+        overflow: 'auto',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+        border: '3px solid red' // DEBUG: should be very visible
+      }}>
         <div className="modal-header">
           <h2>{title}</h2>
           <button className="close" onClick={()=>!busy && onClose()}>&times;</button>

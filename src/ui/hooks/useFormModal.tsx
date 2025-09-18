@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
-import { FormModal, FormField } from '../components/FormModal.js';
+import { FormModal, FormField } from '../components/FormModal.tsx';
 
 interface ShowFormArgs<T>{ title:string; fields: FormField<T>[]; initial?: Partial<T>; submitLabel?:string; busyLabel?:string; validate?(values:T): string | null; }
 interface FormModalContextValue { showForm<T=any, R=void>(args: ShowFormArgs<T>, onSubmit:(values:T)=>Promise<R>|R): Promise<R|undefined>; }
@@ -9,10 +9,18 @@ export function FormModalProvider({ children }: { children: React.ReactNode }) {
   const [stack, setStack] = useState<any[]>([]);
 
   const showForm = useCallback(<T, R=void>(args: ShowFormArgs<T>, onSubmit:(v:T)=>Promise<R>|R)=>{
+    console.log('showForm called with:', args); // Debug log
     return new Promise<R|undefined>((resolve)=>{
       const id = Math.random().toString(36).slice(2);
-      const close = (result?:R)=>{ setStack(s=> s.filter(m=>m.id!==id)); resolve(result); };
-      setStack(s=> [...s, { id, args, onSubmit, close }]);
+      const close = (result?:R)=>{ 
+        console.log('Modal closing with result:', result); // Debug log
+        setStack(s=> s.filter(m=>m.id!==id)); 
+        resolve(result); 
+      };
+      setStack(s=> {
+        console.log('Adding modal to stack, current stack:', s); // Debug log
+        return [...s, { id, args, onSubmit, close }];
+      });
     });
   },[]);
 
